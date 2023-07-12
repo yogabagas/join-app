@@ -1,0 +1,22 @@
+version: '3'
+services:
+  app:
+    container_name: mentoring-app
+    build: .
+    image: mentoring-app
+    ports:
+      - 8800:8800
+    restart: on-failure
+    environment:
+      - APP_ENV=local
+    volumes:
+      - api:/usr/src/app
+    networks:
+      - fullstack
+
+volumes:
+    api:
+
+networks:
+  fullstack:
+    driver: bridge

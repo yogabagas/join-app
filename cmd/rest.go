@@ -1,0 +1,41 @@
+package cmd
+
+import (
+	"github/yogabagas/print-in/config"
+	"github/yogabagas/print-in/transport/rest"
+	"log"
+	"os"
+	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/spf13/cobra"
+)
+
+var serverCmd = &cobra.Command{
+	Use: "api-serve",
+	PreRun: func(cmd *cobra.Command, args []string) {
+
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatalln("can't load env", err)
+			os.Exit(1)
+		}
+
+		config.LoadConfig(configURL)
+
+		sqlDB, _ = InitSQLModule()
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+
+		rest := rest.NewRest(
+			&rest.Option{
+				Port:         config.GlobalCfg.App.Port,
+				ReadTimeout:  time.Duration(config.GlobalCfg.App.ReadTimeout * int(time.Second)),
+				WriteTimeout: time.Duration(config.GlobalCfg.App.WriteTimeout * int(time.Second)),
+				Sql:          sqlDB.MySQL,
+			},
+		)
+		go rest.Serve()
+		rest.SignalCheck()
+	},
+}

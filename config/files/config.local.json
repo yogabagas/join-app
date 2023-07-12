@@ -1,0 +1,18 @@
+{
+    "app": {
+        "name": "print-in app",
+        "host": "localhost",
+        "port": ":8800",
+        "read_timeout": 30,
+        "write_timeout": 30
+    },
+    "db": {
+        "sql": {
+            "user": "root",
+            "password": "root",
+            "host": "127.0.0.1:3306",
+            "schema": "printindb"
+        }
+    },
+    "password_alg": "sha"
+}
