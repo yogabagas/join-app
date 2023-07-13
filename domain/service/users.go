@@ -8,5 +8,5 @@ type CreateUsersReq struct {
 	RoleID    int    `json:"role_id"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
-	CreatedBy string
+	CreatedBy string `json:"-"`
 }
