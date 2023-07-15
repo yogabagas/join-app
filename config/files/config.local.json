@@ -4,14 +4,15 @@
         "host": "localhost",
         "port": ":8800",
         "read_timeout": 30,
-        "write_timeout": 30
+        "write_timeout": 30,
+        "jwt_secret": "secret"
     },
     "db": {
         "sql": {
             "user": "root",
-            "password": "root",
+            "password": "P@ssw0rd",
             "host": "127.0.0.1:3306",
-            "schema": "printindb"
+            "schema": "mentoring"
         }
     },
     "password_alg": "sha"
