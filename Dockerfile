@@ -16,6 +16,8 @@ RUN go mod tidy
 
 RUN go mod vendor
 
+RUN make docs
+
 RUN go build -o binary -ldflags "-X cmd/bootstrap.Flags=$FLAGS"
 
 EXPOSE 8800
