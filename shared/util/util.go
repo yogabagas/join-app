@@ -1,0 +1,52 @@
+package util
+
+import (
+	"crypto/md5"
+	"crypto/sha256"
+	"encoding/base64"
+	"errors"
+	"github/yogabagas/print-in/shared/constant"
+	"math/rand"
+	"time"
+
+	"github.com/matthewhartstonge/argon2"
+	ulid "github.com/oklog/ulid/v2"
+	"golang.org/x/crypto/bcrypt"
+)
+
+func NewULIDGenerate() string {
+	defaultEntropySource := ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0)
+	return ulid.MustNew(ulid.Timestamp(time.Now()), defaultEntropySource).String()
+}
+
+func Hash(alg, pwd string) ([]byte, error) {
+
+	switch alg {
+	case constant.Bcrypt.String():
+		h, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+		if err != nil {
+			return nil, err
+		}
+		return h, nil
+	case constant.MD5.String():
+		h := md5.Sum([]byte(pwd))
+		return h[:], nil
+	case constant.Argon.String():
+		conf := argon2.DefaultConfig()
+		h, err := conf.HashEncoded([]byte(pwd))
+		if err != nil {
+			return nil, err
+		}
+		return h, nil
+	case constant.SHA.String():
+		h := sha256.Sum256([]byte(pwd))
+		return h[:], nil
+	default:
+		return nil, errors.New("[CLIENT] - Unsupported algorithm")
+	}
+
+}
+
+func Base64(b []byte) string {
+	return base64.StdEncoding.EncodeToString(b)
+}

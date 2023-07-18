@@ -1,0 +1,40 @@
+version: '3'
+services:
+  app:
+    container_name: join-app
+    build: .
+    working_dir: /app
+    image: join-app
+    ports:
+      - 8800:8800
+    restart: on-failure
+    volumes:
+      - api:/usr/src/app
+    depends_on:
+      - db
+    networks:
+      - fullstack
+  
+  db:
+      image: mysql
+      restart: on-failure
+      container_name: joindb
+      ports:
+        - 3306:3306
+        - 33060:33060
+      environment:
+        - MYSQL_DATABASE=joindb
+        - MYSQL_ROOT_PASSWORD=root
+      volumes:
+        - database_mysql:/var/lib/mysql
+      networks:
+        - fullstack
+
+
+volumes:
+    api:
+    database_mysql:
+
+networks:
+  fullstack:
+    driver: bridge
