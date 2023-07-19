@@ -21,6 +21,7 @@ type (
 		Port         string `json:"port"`
 		ReadTimeout  int    `json:"read_timeout"`
 		WriteTimeout int    `json:"write_timeout"`
+		JwtSecret    string `json:"jwt_secret"`
 	}
 
 	DB struct {
