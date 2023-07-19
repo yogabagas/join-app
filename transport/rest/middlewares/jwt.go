@@ -19,11 +19,11 @@ func AuthenticationMiddleware(next http.Handler) http.Handler {
 			if parseJwt(r.Header.Get("authorization")) {
 				next.ServeHTTP(w, r)
 			} else {
-				res.SetError(response.ErrUnauthorized).SetMessage(errors.New("invalid authorized token").Error()).Send(w)
+				res.SetError(response.ErrUnauthorized).SetMessage(errors.New("Invalid Authorized Token").Error()).Send(w)
 				return
 			}
 		} else {
-			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("an authorization header is required").Error()).Send(w)
+			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("An Authorization Header is required").Error()).Send(w)
 			return
 		}
 	})

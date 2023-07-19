@@ -7,6 +7,7 @@ import (
 	"github/yogabagas/print-in/registry"
 	groupV1 "github/yogabagas/print-in/transport/rest/group/v1"
 	"github/yogabagas/print-in/transport/rest/handler"
+	"github/yogabagas/print-in/transport/rest/middlewares"
 	"log"
 	"net/http"
 	"os"
@@ -59,7 +60,7 @@ func NewRest(o *Option) *Handler {
 	}
 
 	r := mux.NewRouter()
-
+	r.Use(middlewares.AuthenticationMiddleware)
 	URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
 
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
