@@ -1,5 +1,5 @@
 name: join-apps-ci-cd
-run-name: Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}
+run-name: Deploy to ${{ push.branches }} by @${{ github.actor }}
 
 on:
   push:
@@ -41,9 +41,8 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
           script: |
             docker pull yogabagas/join-app:latest
             docker compose -f docker-compose-db-prod.yml down
