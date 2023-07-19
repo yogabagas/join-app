@@ -2,6 +2,8 @@ FROM golang:alpine
 
 ENV GOOS=linux
 
+ENV GOARCH=amd64
+
 RUN apk update && apk add --no-cache git
 
 WORKDIR /app
@@ -14,7 +16,7 @@ RUN go mod vendor
 
 RUN go build -o binary -ldflags "-X cmd/bootstrap.Flags=$FLAGS"
 
-EXPOSE 9090
+EXPOSE 8800
 
 ENTRYPOINT ["/app/binary"]
 

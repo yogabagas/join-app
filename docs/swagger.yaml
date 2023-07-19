@@ -1,0 +1,78 @@
+basePath: /
+definitions:
+  response.JSONResponse:
+    properties:
+      code:
+        type: string
+      data: {}
+      error:
+        type: string
+      latency:
+        type: string
+      message:
+        type: string
+      result: {}
+      status:
+        type: string
+      status_code:
+        type: integer
+    type: object
+  service.CreateUsersReq:
+    properties:
+      birthdate:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      role_id:
+        type: integer
+      username:
+        type: string
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Mentoring Service API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Mentoring Service API
+  version: "1.0"
+paths:
+  /v1/users:
+    post:
+      description: User registration endpoint
+      parameters:
+      - description: Request Create User
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateUsersReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: Create New User
+      tags:
+      - Users V1.0
+swagger: "2.0"

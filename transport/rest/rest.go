@@ -45,6 +45,7 @@ type Handler struct {
 // @contact.email support@swagger.io
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+// @host
 // @BasePath /
 // @name Mentoring App
 func NewRest(o *Option) *Handler {
