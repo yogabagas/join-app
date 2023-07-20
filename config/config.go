@@ -36,13 +36,17 @@ type (
 
 func LoadConfig(path string) interface{} {
 
+	env := os.Getenv("APP_ENV")
+
+	log.Println("environment", env)
+
 	if GlobalCfg == nil {
 		err := config.ReadModuleConfig(
 			&config.Cfg{
 				Target: &GlobalCfg,
 				Path:   path,
 				Module: "config",
-				Env:    os.Getenv("APP_ENV"),
+				Env:    env,
 			})
 		if err != nil {
 			log.Fatalln("can't load file config", err)
