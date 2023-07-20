@@ -9,4 +9,5 @@ import (
 
 func NewUsersV1(h handler.HandlerImpl, r *mux.Router) {
 	r.HandleFunc("/users", h.CreateUsers).Methods(http.MethodPost)
+
 }
