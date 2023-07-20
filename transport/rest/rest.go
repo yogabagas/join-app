@@ -54,13 +54,14 @@ func NewRest(o *Option) *Handler {
 	)
 
 	appController := reg.NewAppController()
+	middleware := middlewares.NewMiddleware()
 
 	handlerImpl := handler.HandlerImpl{
 		Controller: appController,
 	}
 
 	r := mux.NewRouter()
-	r.Use(middlewares.AuthenticationMiddleware)
+
 	URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
 
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
@@ -72,6 +73,7 @@ func NewRest(o *Option) *Handler {
 	r.PathPrefix("/health").HandlerFunc(handlerImpl.Healthcheck)
 
 	v1 := r.PathPrefix("/v1").Subrouter()
+	v1.Use(middleware.AuthenticationMiddleware)
 
 	groupV1.NewUsersV1(handlerImpl, v1)
 	groupV1.NewRolesV1(handlerImpl, v1)
