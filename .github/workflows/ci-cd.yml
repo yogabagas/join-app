@@ -49,4 +49,5 @@ jobs:
             docker compose -f docker-compose-app-prod.yml down
             docker compose -f docker-compose.db.prod up -d
             docker compose -f docker-compose-app-prod.yml up -d
-            docker image prune -f
+            docker cp config.prod.json join-app:/app/config/files/config.prod.json
+            docker image prune -a

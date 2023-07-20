@@ -35,7 +35,7 @@ type Handler struct {
 }
 
 // NewRest
-// @title Mentoring Service API
+// @title Join App API
 // @version 1.0
 // @description Mentoring Service API
 // @termsOfService http://swagger.io/terms/
@@ -44,7 +44,6 @@ type Handler struct {
 // @contact.email support@swagger.io
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host
 // @BasePath /
 // @name Mentoring App
 func NewRest(o *Option) *Handler {
