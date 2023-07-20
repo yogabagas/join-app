@@ -1,0 +1,18 @@
+{
+    "app": {
+        "name": "",
+        "host": "",
+        "port": ":",
+        "read_timeout": 0,
+        "write_timeout": 0
+    },
+    "db": {
+        "sql": {
+            "user": "",
+            "password": "",
+            "host": "",
+            "schema": ""
+        }
+    },
+    "password_alg": ""
+}

@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "Mentoring Service API",
-        "title": "Mentoring Service API",
+        "title": "Join App API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",

@@ -130,7 +130,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Mentoring Service API",
+	Title:            "Join App API",
 	Description:      "Mentoring Service API",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
