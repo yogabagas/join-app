@@ -45,9 +45,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             docker pull yogabagas/join-app:latest
-            docker compose -f docker-compose-db-prod.yml down
-            docker compose -f docker-compose-app-prod.yml down
-            docker compose -f docker-compose.db.prod up -d
-            docker compose -f docker-compose-app-prod.yml up -d
+            docker-compose -f docker-compose-db-prod.yml down
+            docker-compose -f docker-compose-app-prod.yml down
+            docker-compose -f docker-compose.db.prod up -d
+            docker-compose -f docker-compose-app-prod.yml up -d
             docker cp config/config.prod.json join-app:/app/config/files/config.prod.json
-            docker image prune -a
+            docker image prune -f
