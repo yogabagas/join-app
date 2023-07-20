@@ -10,8 +10,8 @@
         "sql": {
             "user": "root",
             "password": "root",
-            "host": "127.0.0.1:3306",
-            "schema": "printindb"
+            "host": "db:3306",
+            "schema": "joindb"
         }
     },
     "password_alg": "sha"
