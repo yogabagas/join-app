@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github/yogabagas/print-in/shared/constant"
 	"math/rand"
+	"regexp"
 	"time"
 
 	"github.com/matthewhartstonge/argon2"
@@ -49,4 +50,10 @@ func Hash(alg, pwd string) ([]byte, error) {
 
 func Base64(b []byte) string {
 	return base64.StdEncoding.EncodeToString(b)
+}
+
+func ValidateEmail(email string) bool {
+	var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
+	return emailRegex.MatchString(email)
 }

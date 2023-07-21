@@ -12,6 +12,7 @@ type UsersControllerImpl struct {
 
 type UsersController interface {
 	CreateUsers(ctx context.Context, req service.CreateUsersReq) error
+	Login(ctx context.Context, req service.LoginReq) (*service.LoginRes, error)
 }
 
 func NewUsersController(userSvc usecase.UsersService) UsersController {
@@ -20,4 +21,8 @@ func NewUsersController(userSvc usecase.UsersService) UsersController {
 
 func (uc *UsersControllerImpl) CreateUsers(ctx context.Context, req service.CreateUsersReq) error {
 	return uc.usersSvc.CreateUsers(ctx, req)
+}
+
+func (uc *UsersControllerImpl) Login(ctx context.Context, req service.LoginReq) (*service.LoginRes, error) {
+	return uc.usersSvc.Login(ctx, req)
 }

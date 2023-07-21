@@ -9,9 +9,9 @@
     "db": {
         "sql": {
             "user": "root",
-            "password": "root",
+            "password": "P@ssw0rd",
             "host": "127.0.0.1:3306",
-            "schema": "printindb"
+            "schema": "mentoring"
         }
     },
     "password_alg": "sha"
