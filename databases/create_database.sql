@@ -1,1 +1,1 @@
-CREATE DATABASE printindb;
+CREATE DATABASE joindb;

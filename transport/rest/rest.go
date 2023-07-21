@@ -7,6 +7,7 @@ import (
 	"github/yogabagas/print-in/registry"
 	groupV1 "github/yogabagas/print-in/transport/rest/group/v1"
 	"github/yogabagas/print-in/transport/rest/handler"
+	"github/yogabagas/print-in/transport/rest/middlewares"
 	"log"
 	"net/http"
 	"os"
@@ -35,7 +36,7 @@ type Handler struct {
 }
 
 // NewRest
-// @title Mentoring Service API
+// @title Join App API
 // @version 1.0
 // @description Mentoring Service API
 // @termsOfService http://swagger.io/terms/
@@ -53,6 +54,7 @@ func NewRest(o *Option) *Handler {
 	)
 
 	appController := reg.NewAppController()
+	middleware := middlewares.NewMiddleware()
 
 	handlerImpl := handler.HandlerImpl{
 		Controller: appController,
@@ -71,6 +73,7 @@ func NewRest(o *Option) *Handler {
 	r.PathPrefix("/health").HandlerFunc(handlerImpl.Healthcheck)
 
 	v1 := r.PathPrefix("/v1").Subrouter()
+	v1.Use(middleware.AuthenticationMiddleware)
 
 	groupV1.NewUsersV1(handlerImpl, v1)
 	groupV1.NewRolesV1(handlerImpl, v1)

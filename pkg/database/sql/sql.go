@@ -28,6 +28,8 @@ func NewDBConn(kind string) (*DB, error) {
 				config.GlobalCfg.DB.SQL.Host,
 				config.GlobalCfg.DB.SQL.Schema)
 
+			log.Printf("database connection : %s", schemaURL)
+
 			db, err := sql.Open(constant.MySQL.String(), schemaURL)
 			if err != nil {
 				log.Panic(err.Error())
