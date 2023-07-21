@@ -46,6 +46,8 @@ type Handler struct {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @BasePath /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
 // @name Mentoring App
 func NewRest(o *Option) *Handler {
 

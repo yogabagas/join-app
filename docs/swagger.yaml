@@ -17,6 +17,13 @@ definitions:
       status_code:
         type: integer
     type: object
+  service.CreateRolesReq:
+    properties:
+      created_by:
+        type: string
+      name:
+        type: string
+    type: object
   service.CreateUsersReq:
     properties:
       birthdate:
@@ -47,6 +54,36 @@ info:
   title: Join App API
   version: "1.0"
 paths:
+  /v1/roles:
+    post:
+      description: Roles registration endpoint
+      parameters:
+      - description: Request Roles User
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateRolesReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create New Roles
+      tags:
+      - Roles V1.0
   /v1/users:
     post:
       description: User registration endpoint
@@ -75,4 +112,9 @@ paths:
       summary: Create New User
       tags:
       - Users V1.0
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Mentoring App
+    type: apiKey
 swagger: "2.0"
