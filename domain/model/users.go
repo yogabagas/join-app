@@ -22,6 +22,7 @@ type User struct {
 }
 
 type TokenClaim struct {
-	ID int `json:"id"`
+	ID    int    `json:"id"`
+	Email string `json:"email"`
 	jwt.StandardClaims
 }

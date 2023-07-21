@@ -103,6 +103,7 @@ func (us *UsersServiceImpl) Login(ctx context.Context, req service.LoginReq) (*s
 
 	tokenClaim := model.TokenClaim{}
 	tokenClaim.ID = user.ID
+	tokenClaim.Email = user.Email
 	tokenClaim.StandardClaims.IssuedAt = time.Now().Unix()
 	tokenClaim.StandardClaims.Id = util.NewULIDGenerate()
 
@@ -124,11 +125,11 @@ func (us *UsersServiceImpl) Login(ctx context.Context, req service.LoginReq) (*s
 
 func createToken(user *model.User) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Username,
-		"password": user.Password,
-		"exp":      time.Now().Add(time.Hour * time.Duration(1)).Unix(),
+		"id":    user.ID,
+		"email": user.Email,
+		"exp":   time.Now().Add(time.Hour * time.Duration(1)).Unix(),
 	})
-	tokenString, err := token.SignedString([]byte("secret"))
+	tokenString, err := token.SignedString([]byte(config.GlobalCfg.App.JwtSecret))
 	if err != nil {
 		fmt.Println(err)
 	}
