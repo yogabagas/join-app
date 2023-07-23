@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"github/yogabagas/print-in/adapter/controller"
 	repo "github/yogabagas/print-in/domain/repository/sql"
+	"github/yogabagas/print-in/pkg/cache"
 )
 
 type module struct {
 	sqlDB *sql.DB
+	cache cache.Cache
 }
 
 type Registry interface {
@@ -32,8 +34,14 @@ func NewSQLConn(db *sql.DB) Option {
 	}
 }
 
+func NewCache(cache cache.Cache) Option {
+	return func(m *module) {
+		m.cache = cache
+	}
+}
+
 func (m *module) NewRepositoryRegistry() repo.RepositoryRegistry {
-	return repo.NewRepositoryRegistry(m.sqlDB)
+	return repo.NewRepositoryRegistry(m.sqlDB, m.cache)
 }
 
 func (m *module) NewAppController() controller.AppController {

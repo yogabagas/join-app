@@ -48,8 +48,8 @@ func (h *HandlerImpl) CreateUsers(w http.ResponseWriter, r *http.Request) {
 // @Description Login registration endpoint
 // @Tags Users V1.0
 // @Produce json
-// @Param users body service.CreateUsersReq true "Request Create User"
-// @Success 200 {object} response.JSONResponse().APIStatusCreated()
+// @Param users body service.LoginReq true "Request Login"
+// @Success 200 {object} response.JSONResponse().APIStatusSuccess()
 // @Failure 400 {object} response.JSONResponse
 // @Failure 500 {object} response.JSONResponse
 // @Router /v1/login [POST]
@@ -63,7 +63,6 @@ func (h *HandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req service.LoginReq
-	//var req service.CreateUsersReq
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/golang-jwt/jwt"
 	"time"
 )
 
@@ -19,10 +18,4 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedBy string
 	UpdatedAt time.Time
-}
-
-type TokenClaim struct {
-	ID    int    `json:"id"`
-	Email string `json:"email"`
-	jwt.StandardClaims
 }

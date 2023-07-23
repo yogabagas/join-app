@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github/yogabagas/print-in/config"
+	"github/yogabagas/print-in/pkg/cache"
 	"github/yogabagas/print-in/registry"
 	groupV1 "github/yogabagas/print-in/transport/rest/group/v1"
 	"github/yogabagas/print-in/transport/rest/handler"
@@ -27,6 +28,7 @@ type Option struct {
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 	Sql          *sql.DB
+	Cache        cache.Cache
 	Mux          *mux.Router
 }
 
@@ -51,6 +53,7 @@ func NewRest(o *Option) *Handler {
 
 	reg := registry.NewRegistry(
 		registry.NewSQLConn(o.Sql),
+		registry.NewCache(o.Cache),
 	)
 
 	appController := reg.NewAppController()

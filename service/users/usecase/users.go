@@ -93,7 +93,7 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 }
 
 func (us *UsersServiceImpl) Login(ctx context.Context, req service.LoginReq) (*service.LoginRes, error) {
-	user, err := us.usersRepo.FindByEmail(ctx, req.Email)
+	user, err := us.usersRepo.ReadUserByEmail(ctx, req.Email)
 
 	pwd, err := util.Hash(config.GlobalCfg.PasswordAlg, req.Password)
 
@@ -101,37 +101,41 @@ func (us *UsersServiceImpl) Login(ctx context.Context, req service.LoginReq) (*s
 		return nil, errors.New("Invalid Password")
 	}
 
-	tokenClaim := model.TokenClaim{}
-	tokenClaim.ID = user.ID
-	tokenClaim.Email = user.Email
-	tokenClaim.StandardClaims.IssuedAt = time.Now().Unix()
-	tokenClaim.StandardClaims.Id = util.NewULIDGenerate()
+	accessToken, err := us.CreateToken(24, user)
+	if err != nil {
+		return nil, err
+	}
 
-	token := createToken(user)
-	birthdate := user.Birthdate.Format("2006-01-02")
+	refreshToken, err := us.CreateToken(24, user)
+	if err != nil {
+		return nil, err
+	}
+
+	err = us.usersRepo.CreateSession(ctx, user.UserUID)
+	if err != nil {
+		return nil, err
+	}
+
 	data := service.LoginRes{
-		Account: service.LoginUsersRes{
-			FirstName: &user.FirstName,
-			LastName:  &user.LastName,
-			Birthdate: &birthdate,
-			Email:     &user.Email,
-			Username:  &user.Username,
-		},
-		AccessToken: token,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	}
 
 	return &data, err
 }
 
-func createToken(user *model.User) string {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":    user.ID,
-		"email": user.Email,
-		"exp":   time.Now().Add(time.Hour * time.Duration(1)).Unix(),
-	})
-	tokenString, err := token.SignedString([]byte(config.GlobalCfg.App.JwtSecret))
+func (us *UsersServiceImpl) CreateToken(ttl time.Duration, user *model.Session) (string, error) {
+	now := time.Now().UTC()
+	claims := make(jwt.MapClaims)
+	claims["user_id"] = user.UserUID
+	claims["role_uuid"] = user.RoleUID
+	claims["exp"] = now.Add(ttl * time.Hour).Unix()
+
+	token, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString([]byte(config.GlobalCfg.App.JwtSecret))
+
 	if err != nil {
-		fmt.Println(err)
+		return "", fmt.Errorf("create: sign token: %w", err)
 	}
-	return tokenString
+
+	return token, nil
 }

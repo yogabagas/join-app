@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"github/yogabagas/print-in/pkg/cache"
 	authzRepo "github/yogabagas/print-in/service/authz/repository"
 	rolesRepo "github/yogabagas/print-in/service/roles/repository"
 	usersRepo "github/yogabagas/print-in/service/users/repository"
@@ -12,6 +13,7 @@ type InTransaction func(RepositoryRegistry) (interface{}, error)
 
 type RepositoryRegistryImpl struct {
 	db         *sql.DB
+	cache      cache.Cache
 	dbExecutor DBExecutor
 }
 
@@ -23,8 +25,8 @@ type RepositoryRegistry interface {
 	DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error)
 }
 
-func NewRepositoryRegistry(db *sql.DB) RepositoryRegistry {
-	return &RepositoryRegistryImpl{db: db}
+func NewRepositoryRegistry(db *sql.DB, cache cache.Cache) RepositoryRegistry {
+	return &RepositoryRegistryImpl{db: db, cache: cache}
 }
 
 func (r RepositoryRegistryImpl) AuthzRepository() authzRepo.AuthzRepository {
@@ -43,9 +45,9 @@ func (r RepositoryRegistryImpl) RolesRepository() rolesRepo.RolesRepository {
 
 func (r RepositoryRegistryImpl) UserRepository() usersRepo.UsersRepository {
 	if r.dbExecutor != nil {
-		return NewUsersRepository(r.dbExecutor)
+		return NewUsersRepository(r.dbExecutor, r.cache)
 	}
-	return NewUsersRepository(r.db)
+	return NewUsersRepository(r.db, r.cache)
 }
 
 func (r RepositoryRegistryImpl) DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error) {

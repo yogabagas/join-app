@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github/yogabagas/print-in/domain/model"
+	"github/yogabagas/print-in/pkg/cache"
 	"github/yogabagas/print-in/service/users/repository"
 	"strings"
 )
@@ -11,15 +12,16 @@ import (
 const (
 	insertUsers = `INSERT INTO users (uid, first_name, last_name, email, birthdate, username, password, created_by, updated_by) 
 	VALUES (?,?,?,?,?,?,?,?,?)`
-	selectByEmail = `SELECT uid, first_name, last_name, email, birthdate, username, password from users WHERE email = ? `
+	selectByEmail = `select a.user_uid, a.role_uid, u.password  from users u join authz a on u.uid  = a.user_uid where email = ? `
 )
 
 type UsersRepositoryImpl struct {
-	db DBExecutor
+	db    DBExecutor
+	cache cache.Cache
 }
 
-func NewUsersRepository(db DBExecutor) repository.UsersRepository {
-	return &UsersRepositoryImpl{db: db}
+func NewUsersRepository(db DBExecutor, cache cache.Cache) repository.UsersRepository {
+	return &UsersRepositoryImpl{db: db, cache: cache}
 }
 
 func (ur *UsersRepositoryImpl) CreateUsers(ctx context.Context, req *model.User) error {
@@ -33,14 +35,22 @@ func (ur *UsersRepositoryImpl) CreateUsers(ctx context.Context, req *model.User)
 	return nil
 }
 
-func (ur *UsersRepositoryImpl) FindByEmail(ctx context.Context, email string) (resp *model.User, err error) {
-	resp = &model.User{}
+func (ur *UsersRepositoryImpl) ReadUserByEmail(ctx context.Context, email string) (resp *model.Session, err error) {
+	resp = &model.Session{}
 	err = ur.db.QueryRowContext(ctx, selectByEmail, email).
-		Scan(&resp.UID, &resp.FirstName, &resp.LastName, &resp.Email, &resp.Birthdate, &resp.Username, &resp.Password)
+		Scan(&resp.UserUID, &resp.RoleUID, &resp.Password)
 
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 
 	return resp, err
+}
+
+func (ur *UsersRepositoryImpl) CreateSession(ctx context.Context, userUUID string) error {
+	return ur.cache.Set(ctx, "user_uuid:"+userUUID, true, 1440)
+}
+
+func (ur *UsersRepositoryImpl) DeleteSession(ctx context.Context, userUUID string) error {
+	return ur.cache.Delete(ctx, "user_uuid:"+userUUID)
 }
