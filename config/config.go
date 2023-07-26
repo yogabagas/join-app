@@ -12,6 +12,7 @@ type (
 	Config struct {
 		App         App    `json:"app"`
 		DB          DB     `json:"db"`
+		Cache       Cache  `json:"cache"`
 		PasswordAlg string `json:"password_alg"`
 	}
 
@@ -31,6 +32,14 @@ type (
 			Host     string `json:"host"`
 			Schema   string `json:"schema"`
 		} `json:"sql"`
+	}
+
+	Cache struct {
+		Redis struct {
+			User     string `json:"user"`
+			Password string `json:"password"`
+			Host     string `json:"host"`
+		} `json:"redis"`
 	}
 )
 

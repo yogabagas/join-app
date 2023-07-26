@@ -48,7 +48,7 @@ func (ur *UsersRepositoryImpl) ReadUserByEmail(ctx context.Context, email string
 }
 
 func (ur *UsersRepositoryImpl) CreateSession(ctx context.Context, userUUID string) error {
-	return ur.cache.Set(ctx, "user_uuid:"+userUUID, true, 1440)
+	return ur.cache.Set(ctx, "user_uuid:"+userUUID, true, 86400)
 }
 
 func (ur *UsersRepositoryImpl) DeleteSession(ctx context.Context, userUUID string) error {

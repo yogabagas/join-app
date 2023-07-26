@@ -14,5 +14,12 @@
             "schema": ""
         }
     },
+    "cache": {
+        "redis": {
+            "user": "",
+            "password": "",
+            "host": "localhost:6379"
+        }
+    },
     "password_alg": ""
 }

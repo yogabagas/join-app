@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github/yogabagas/print-in/config"
@@ -35,17 +36,17 @@ func (mi *MiddlewareImpl) AuthenticationMiddleware(next http.Handler) http.Handl
 			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("An Authorization Header is required").Error()).Send(w)
 			return
 		}
-
-		if !mi.parseJwt(token) && !isRegister {
+		valid, ctx := mi.parseJwt(token, r)
+		if !valid && !isRegister {
 			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("Invalid Authorized Token").Error()).Send(w)
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
-func (mi *MiddlewareImpl) parseJwt(authorizationHeader string) (valid bool) {
+func (mi *MiddlewareImpl) parseJwt(authorizationHeader string, r *http.Request) (valid bool, ctx context.Context) {
 	bearerToken := strings.Split(authorizationHeader, " ")
 	if len(bearerToken) == 2 {
 		token, _ := jwt.Parse(bearerToken[1], func(token *jwt.Token) (interface{}, error) {
@@ -55,7 +56,9 @@ func (mi *MiddlewareImpl) parseJwt(authorizationHeader string) (valid bool) {
 			return []byte(config.GlobalCfg.App.JwtSecret), nil
 		})
 
-		return token.Valid
+		ctx = context.WithValue(r.Context(), "user_data", token)
+
+		return token.Valid, ctx
 	}
-	return false
+	return false, ctx
 }

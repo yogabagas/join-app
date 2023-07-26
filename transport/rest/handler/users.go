@@ -82,3 +82,34 @@ func (h *HandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
 
 	res.APIStatusSuccess().SetResult(user).Send(w)
 }
+
+// Logout handler
+// @Summary Login
+// @Description Login registration endpoint
+// @Tags Users V1.0
+// @Produce json
+// @Param users body true "Request Logout"
+// @Success 200 {object} response.JSONResponse().APIStatusSuccess()
+// @Failure 400 {object} response.JSONResponse
+// @Failure 500 {object} response.JSONResponse
+// @Router /v1/logout [POST]
+func (h *HandlerImpl) Logout(w http.ResponseWriter, r *http.Request) {
+
+	res := response.NewJSONResponse()
+
+	if r.Method != http.MethodGet {
+		res.SetError(response.ErrMethodNotAllowed).Send(w)
+		return
+	}
+
+	userData := new(util.UserData)
+	userData = userData.GetUserData(r)
+
+	user, err := h.Controller.UsersController.Logout(r.Context(), userData.UserUUID)
+	if err != nil {
+		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
+		return
+	}
+
+	res.APIStatusSuccess().SetResult(user).Send(w)
+}

@@ -11,8 +11,15 @@
         "sql": {
             "user": "root",
             "password": "P@ssw0rd",
-            "host": "127.0.0.1:3306",
+            "host": "localhost:3306",
             "schema": "mentoring"
+        }
+    },
+    "cache": {
+        "redis": {
+            "user": "",
+            "password": "",
+            "host": "localhost:6379"
         }
     },
     "password_alg": "sha"

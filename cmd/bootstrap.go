@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github/yogabagas/print-in/config"
 	"github/yogabagas/print-in/pkg/cache"
 	"github/yogabagas/print-in/pkg/cache/redis"
 	"github/yogabagas/print-in/pkg/database/sql"
@@ -22,8 +23,8 @@ func InitSQLModule() (*sql.DB, error) {
 
 func InitCache() cache.Cache {
 	redisCreds := url.URL{
-		Host: "localhost:6379",
-		User: url.UserPassword("", "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81"),
+		Host: config.GlobalCfg.Cache.Redis.Host,
+		User: url.UserPassword(config.GlobalCfg.Cache.Redis.User, config.GlobalCfg.Cache.Redis.Password),
 	}
 	client, err := redis.NewCache(&redisCreds)
 	if err != nil {

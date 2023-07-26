@@ -6,7 +6,7 @@ import (
 )
 
 func (m *module) NewUsersRegistry() usecase.UsersService {
-	return usecase.NewUsersService(m.NewRepositoryRegistry())
+	return usecase.NewUsersService(m.NewRepositoryRegistry(), m.NewSessionRepositoryRegistry())
 }
 
 func (m *module) NewUsersController() controller.UsersController {

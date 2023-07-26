@@ -3,6 +3,7 @@ package registry
 import (
 	"database/sql"
 	"github/yogabagas/print-in/adapter/controller"
+	repoCache "github/yogabagas/print-in/domain/repository/cache"
 	repo "github/yogabagas/print-in/domain/repository/sql"
 	"github/yogabagas/print-in/pkg/cache"
 )
@@ -42,6 +43,10 @@ func NewCache(cache cache.Cache) Option {
 
 func (m *module) NewRepositoryRegistry() repo.RepositoryRegistry {
 	return repo.NewRepositoryRegistry(m.sqlDB, m.cache)
+}
+
+func (m *module) NewSessionRepositoryRegistry() repoCache.RepositoryRegistry {
+	return repoCache.NewRepositoryRegistry(m.sqlDB, m.cache)
 }
 
 func (m *module) NewAppController() controller.AppController {

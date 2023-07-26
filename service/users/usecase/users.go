@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github/yogabagas/print-in/config"
 	"github/yogabagas/print-in/domain/model"
+	"github/yogabagas/print-in/domain/repository/cache"
 	"github/yogabagas/print-in/domain/repository/sql"
 	"github/yogabagas/print-in/domain/service"
 	authzRepo "github/yogabagas/print-in/service/authz/repository"
@@ -18,21 +19,24 @@ import (
 )
 
 type UsersServiceImpl struct {
-	authzRepo authzRepo.AuthzRepository
-	rolesRepo rolesRepo.RolesRepository
-	usersRepo usersRepo.UsersRepository
+	authzRepo   authzRepo.AuthzRepository
+	rolesRepo   rolesRepo.RolesRepository
+	usersRepo   usersRepo.UsersRepository
+	sessionRepo usersRepo.SessionRepository
 }
 
 type UsersService interface {
 	CreateUsers(ctx context.Context, req service.CreateUsersReq) error
 	Login(ctx context.Context, req service.LoginReq) (*service.LoginRes, error)
+	Logout(ctx context.Context, userUUID string) (bool, error)
 }
 
-func NewUsersService(repository sql.RepositoryRegistry) UsersService {
+func NewUsersService(repository sql.RepositoryRegistry, sessionRepository cache.RepositoryRegistry) UsersService {
 	return &UsersServiceImpl{
-		authzRepo: repository.AuthzRepository(),
-		rolesRepo: repository.RolesRepository(),
-		usersRepo: repository.UserRepository(),
+		authzRepo:   repository.AuthzRepository(),
+		rolesRepo:   repository.RolesRepository(),
+		usersRepo:   repository.UserRepository(),
+		sessionRepo: sessionRepository.SessionRepository(),
 	}
 }
 
@@ -111,7 +115,7 @@ func (us *UsersServiceImpl) Login(ctx context.Context, req service.LoginReq) (*s
 		return nil, err
 	}
 
-	err = us.usersRepo.CreateSession(ctx, user.UserUID)
+	err = us.sessionRepo.CreateSession(ctx, user.UserUID)
 	if err != nil {
 		return nil, err
 	}
@@ -124,18 +128,29 @@ func (us *UsersServiceImpl) Login(ctx context.Context, req service.LoginReq) (*s
 	return &data, err
 }
 
+func (us *UsersServiceImpl) Logout(ctx context.Context, userUUID string) (bool, error) {
+	err := us.sessionRepo.DeleteSession(ctx, userUUID)
+	if err != nil {
+		return false, err
+	}
+
+	return true, err
+}
+
 func (us *UsersServiceImpl) CreateToken(ttl time.Duration, user *model.Session) (string, error) {
 	now := time.Now().UTC()
 	claims := make(jwt.MapClaims)
-	claims["user_id"] = user.UserUID
+	claims["user_uuid"] = user.UserUID
 	claims["role_uuid"] = user.RoleUID
 	claims["exp"] = now.Add(ttl * time.Hour).Unix()
 
-	token, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString([]byte(config.GlobalCfg.App.JwtSecret))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	tokenString, err := token.SignedString([]byte(config.GlobalCfg.App.JwtSecret))
 
 	if err != nil {
 		return "", fmt.Errorf("create: sign token: %w", err)
 	}
 
-	return token, nil
+	return tokenString, nil
 }
