@@ -18,7 +18,7 @@
         "redis": {
             "user": "",
             "password": "",
-            "host": "localhost:6379"
+            "host": ""
         }
     },
     "password_alg": ""
