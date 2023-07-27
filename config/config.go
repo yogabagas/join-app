@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github/yogabagas/print-in/pkg/config"
+	"github/yogabagas/join-app/pkg/config"
 	"log"
 	"os"
 )
@@ -22,6 +22,7 @@ type (
 		ReadTimeout  int    `json:"read_timeout"`
 		WriteTimeout int    `json:"write_timeout"`
 		JwtSecret    string `json:"jwt_secret"`
+		LogLevel     string `json:"log_level"`
 	}
 
 	DB struct {

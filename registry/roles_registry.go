@@ -1,10 +1,10 @@
 package registry
 
 import (
-	"github/yogabagas/print-in/adapter/controller"
-	"github/yogabagas/print-in/domain/repository/sql"
-	"github/yogabagas/print-in/service/roles/repository"
-	"github/yogabagas/print-in/service/roles/usecase"
+	"github/yogabagas/join-app/adapter/controller"
+	"github/yogabagas/join-app/domain/repository/sql"
+	"github/yogabagas/join-app/service/roles/repository"
+	"github/yogabagas/join-app/service/roles/usecase"
 )
 
 func (m *module) NewRolesRepository() repository.RolesRepository {

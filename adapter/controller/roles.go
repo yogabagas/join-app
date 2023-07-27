@@ -2,8 +2,8 @@ package controller
 
 import (
 	"context"
-	"github/yogabagas/print-in/domain/service"
-	"github/yogabagas/print-in/service/roles/usecase"
+	"github/yogabagas/join-app/domain/service"
+	"github/yogabagas/join-app/service/roles/usecase"
 	"strings"
 )
 

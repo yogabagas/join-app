@@ -7,6 +7,7 @@ CREATE TABLE `roles` (
     `created_at` datetime NOT NULL DEFAULT now(),
     `updated_by` varchar(100) NOT NULL,
     `updated_at` datetime NOT NULL DEFAULT now(),
+    FULLTEXT KEY (`name`),
     PRIMARY KEY (`id`),
     UNIQUE KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

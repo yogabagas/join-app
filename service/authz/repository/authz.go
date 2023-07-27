@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"github/yogabagas/print-in/domain/model"
+	"github/yogabagas/join-app/domain/model"
 )
 
 type AuthzRepository interface {
