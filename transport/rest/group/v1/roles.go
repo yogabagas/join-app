@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"github/yogabagas/print-in/transport/rest/handler"
+	"github/yogabagas/join-app/transport/rest/handler"
 	"net/http"
 
 	"github.com/gorilla/mux"

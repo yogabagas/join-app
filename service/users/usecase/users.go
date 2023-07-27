@@ -3,15 +3,17 @@ package usecase
 import (
 	"context"
 	"errors"
-	"github/yogabagas/print-in/config"
-	"github/yogabagas/print-in/domain/model"
-	"github/yogabagas/print-in/domain/repository/sql"
-	"github/yogabagas/print-in/domain/service"
-	authzRepo "github/yogabagas/print-in/service/authz/repository"
-	rolesRepo "github/yogabagas/print-in/service/roles/repository"
-	usersRepo "github/yogabagas/print-in/service/users/repository"
+	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/domain/model"
+	"github/yogabagas/join-app/domain/repository/sql"
+	"github/yogabagas/join-app/domain/service"
+	authzRepo "github/yogabagas/join-app/service/authz/repository"
+	rolesRepo "github/yogabagas/join-app/service/roles/repository"
+	"github/yogabagas/join-app/service/users/presenter"
+	usersRepo "github/yogabagas/join-app/service/users/repository"
 
-	"github/yogabagas/print-in/shared/util"
+	"github/yogabagas/join-app/shared/constant"
+	"github/yogabagas/join-app/shared/util"
 	"log"
 	"time"
 )
@@ -20,17 +22,20 @@ type UsersServiceImpl struct {
 	authzRepo authzRepo.AuthzRepository
 	rolesRepo rolesRepo.RolesRepository
 	usersRepo usersRepo.UsersRepository
+	presenter presenter.UsersPresenter
 }
 
 type UsersService interface {
 	CreateUsers(ctx context.Context, req service.CreateUsersReq) error
+	GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (service.GetUsersWithPaginationResp, error)
 }
 
-func NewUsersService(repository sql.RepositoryRegistry) UsersService {
+func NewUsersService(repository sql.RepositoryRegistry, presenter presenter.UsersPresenter) UsersService {
 	return &UsersServiceImpl{
 		authzRepo: repository.AuthzRepository(),
 		rolesRepo: repository.RolesRepository(),
 		usersRepo: repository.UserRepository(),
+		presenter: presenter,
 	}
 }
 
@@ -88,4 +93,25 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 		return err
 	}
 	return nil
+}
+
+func (us *UsersServiceImpl) GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (resp service.GetUsersWithPaginationResp, err error) {
+
+	users, err := us.usersRepo.ReadUsersWithPagination(ctx, &model.ReadUsersWithPaginationReq{
+		Fullname: req.Fullname,
+		Limit:    req.Limit,
+		Offset:   util.PageToOffset(req.Limit, req.Page),
+	})
+	if err != nil {
+		return
+	}
+
+	count, err := us.usersRepo.CountUsers(ctx, &model.CountUsersReq{
+		IsDeleted: constant.False.Int(),
+	})
+	if err != nil {
+		return
+	}
+
+	return us.presenter.GetUsersWithPagination(ctx, req, users, count)
 }

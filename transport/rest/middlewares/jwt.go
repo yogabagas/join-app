@@ -2,9 +2,8 @@ package middlewares
 
 import (
 	"errors"
-	"fmt"
-	"github/yogabagas/print-in/config"
-	"github/yogabagas/print-in/transport/rest/handler/response"
+	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/transport/rest/handler/response"
 	"net/http"
 	"strings"
 
@@ -21,23 +20,23 @@ func NewMiddleware() Middleware {
 	return &MiddlewareImpl{}
 }
 
-var res = response.NewJSONResponse()
-
 // AuthenticationMiddleware validates the JWT token.
 func (mi *MiddlewareImpl) AuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		res := response.NewJSONResponse()
 
 		token := r.Header.Get("Authorization")
 
 		isRegister := r.URL.Path == "/v1/users" && r.Method == http.MethodPost
 
 		if token == "" && !isRegister {
-			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("An Authorization Header is required").Error()).Send(w)
+			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("authorization header is required").Error()).Send(w)
 			return
 		}
 
 		if !mi.parseJwt(token) && !isRegister {
-			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("Invalid Authorized Token").Error()).Send(w)
+			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("invalid authorized token").Error()).Send(w)
 			return
 		}
 

@@ -6,6 +6,8 @@ type (
 	DB string
 
 	Role int
+
+	IsDeleted int
 )
 
 var (
@@ -18,6 +20,9 @@ var (
 
 	Mentor Role = 1
 	Mentee Role = 2
+
+	False IsDeleted = 0
+	True  IsDeleted = 1
 )
 
 func (pa PassAlgorithm) String() string {
@@ -42,4 +47,8 @@ func (r Role) String() string {
 	default:
 		return " "
 	}
+}
+
+func (i IsDeleted) Int() int {
+	return int(i)
 }

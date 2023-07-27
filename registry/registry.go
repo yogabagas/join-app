@@ -2,8 +2,8 @@ package registry
 
 import (
 	"database/sql"
-	"github/yogabagas/print-in/adapter/controller"
-	repo "github/yogabagas/print-in/domain/repository/sql"
+	"github/yogabagas/join-app/adapter/controller"
+	repo "github/yogabagas/join-app/domain/repository/sql"
 )
 
 type module struct {

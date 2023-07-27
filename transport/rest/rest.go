@@ -3,11 +3,10 @@ package rest
 import (
 	"database/sql"
 	"fmt"
-	"github/yogabagas/print-in/config"
-	"github/yogabagas/print-in/registry"
-	groupV1 "github/yogabagas/print-in/transport/rest/group/v1"
-	"github/yogabagas/print-in/transport/rest/handler"
-	"github/yogabagas/print-in/transport/rest/middlewares"
+	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/registry"
+	groupV1 "github/yogabagas/join-app/transport/rest/group/v1"
+	"github/yogabagas/join-app/transport/rest/handler"
 	"log"
 	"net/http"
 	"os"
@@ -15,7 +14,7 @@ import (
 	"syscall"
 	"time"
 
-	_ "github/yogabagas/print-in/docs"
+	_ "github/yogabagas/join-app/docs"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 
@@ -54,7 +53,7 @@ func NewRest(o *Option) *Handler {
 	)
 
 	appController := reg.NewAppController()
-	middleware := middlewares.NewMiddleware()
+	// middleware := middlewares.NewMiddleware()
 
 	handlerImpl := handler.HandlerImpl{
 		Controller: appController,
@@ -73,7 +72,7 @@ func NewRest(o *Option) *Handler {
 	r.PathPrefix("/health").HandlerFunc(handlerImpl.Healthcheck)
 
 	v1 := r.PathPrefix("/v1").Subrouter()
-	v1.Use(middleware.AuthenticationMiddleware)
+	// v1.Use(middleware.AuthenticationMiddleware)
 
 	groupV1.NewUsersV1(handlerImpl, v1)
 	groupV1.NewRolesV1(handlerImpl, v1)

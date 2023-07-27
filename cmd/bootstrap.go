@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github/yogabagas/print-in/pkg/database/sql"
-	"github/yogabagas/print-in/shared/constant"
+	"github/yogabagas/join-app/pkg/database/sql"
+	"github/yogabagas/join-app/shared/constant"
 )
 
 var (

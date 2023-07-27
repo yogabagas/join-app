@@ -3,8 +3,8 @@ package sql
 import (
 	"database/sql"
 	"fmt"
-	"github/yogabagas/print-in/config"
-	"github/yogabagas/print-in/shared/constant"
+	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/shared/constant"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
