@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"github/yogabagas/print-in/domain/model"
-	"github/yogabagas/print-in/domain/service"
-	"github/yogabagas/print-in/service/roles/repository"
-	"github/yogabagas/print-in/shared/util"
+	"github/yogabagas/join-app/domain/model"
+	"github/yogabagas/join-app/domain/service"
+	"github/yogabagas/join-app/service/roles/repository"
+	"github/yogabagas/join-app/shared/util"
 )
 
 type RolesServiceImpl struct {

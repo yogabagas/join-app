@@ -10,3 +10,29 @@ type CreateUsersReq struct {
 	Password  string `json:"password"`
 	CreatedBy string `json:"-"`
 }
+
+type GetUsersWithPaginationReq struct {
+	Fullname string `json:"name"`
+	Limit    int    `json:"limit"`
+	Page     int    `json:"page"`
+}
+
+type GetUsersWithPaginationResp struct {
+	Users      []UserResp `json:"users"`
+	Pagination Pagination `json:"pagination"`
+}
+
+type UserResp struct {
+	Fullname  string `json:"name"`
+	Username  string `json:"username"`
+	Birthdate string `json:"birthdate"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+}
+
+type Pagination struct {
+	Page      int `json:"page"`
+	PerPage   int `json:"per_page"`
+	TotalPage int `json:"total_page"`
+	TotalData int `json:"total_data"`
+}

@@ -3,9 +3,9 @@ package sql
 import (
 	"context"
 	"database/sql"
-	authzRepo "github/yogabagas/print-in/service/authz/repository"
-	rolesRepo "github/yogabagas/print-in/service/roles/repository"
-	usersRepo "github/yogabagas/print-in/service/users/repository"
+	authzRepo "github/yogabagas/join-app/service/authz/repository"
+	rolesRepo "github/yogabagas/join-app/service/roles/repository"
+	usersRepo "github/yogabagas/join-app/service/users/repository"
 )
 
 type InTransaction func(RepositoryRegistry) (interface{}, error)

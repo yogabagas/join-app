@@ -34,6 +34,39 @@ definitions:
       username:
         type: string
     type: object
+  service.GetUsersWithPaginationResp:
+    properties:
+      pagination:
+        $ref: '#/definitions/service.Pagination'
+      users:
+        items:
+          $ref: '#/definitions/service.UserResp'
+        type: array
+    type: object
+  service.Pagination:
+    properties:
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total_data:
+        type: integer
+      total_page:
+        type: integer
+    type: object
+  service.UserResp:
+    properties:
+      birthdate:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact:
     email: support@swagger.io
@@ -48,6 +81,44 @@ info:
   version: "1.0"
 paths:
   /v1/users:
+    get:
+      description: GetUsersWithPagination for get users detail with limit
+      parameters:
+      - description: user fullname e.g John Doe
+        in: query
+        name: name
+        type: string
+      - description: limit data; default 10
+        in: query
+        name: limit
+        type: integer
+      - description: number of page; default 1
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.GetUsersWithPaginationResp'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: GetUsersWithPagination
+      tags:
+      - Users V1.0
     post:
       description: User registration endpoint
       parameters:

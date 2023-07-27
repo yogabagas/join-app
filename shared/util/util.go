@@ -5,7 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
-	"github/yogabagas/print-in/shared/constant"
+	"github/yogabagas/join-app/shared/constant"
 	"math/rand"
 	"time"
 
@@ -49,4 +49,17 @@ func Hash(alg, pwd string) ([]byte, error) {
 
 func Base64(b []byte) string {
 	return base64.StdEncoding.EncodeToString(b)
+}
+
+func PageToOffset(limit int, page int) int {
+
+	if page <= 1 {
+		return 0
+	}
+
+	return (limit * page) - limit
+}
+
+func GetTotalPage(totalData int, perPage int) int {
+	return (totalData + perPage - 1) / perPage
 }
