@@ -7,6 +7,7 @@ import (
 	"github/yogabagas/join-app/registry"
 	groupV1 "github/yogabagas/join-app/transport/rest/group/v1"
 	"github/yogabagas/join-app/transport/rest/handler"
+	"github/yogabagas/join-app/transport/rest/middlewares"
 	"log"
 	"net/http"
 	"os"
@@ -53,13 +54,14 @@ func NewRest(o *Option) *Handler {
 	)
 
 	appController := reg.NewAppController()
-	// middleware := middlewares.NewMiddleware()
+	middleware := middlewares.NewMiddleware()
 
 	handlerImpl := handler.HandlerImpl{
 		Controller: appController,
 	}
 
 	r := mux.NewRouter()
+	r.Use(middleware.CORSHandle)
 
 	URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
 

@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"errors"
+	"fmt"
 	"github/yogabagas/join-app/config"
 	"github/yogabagas/join-app/transport/rest/handler/response"
 	"net/http"
@@ -14,6 +15,7 @@ type MiddlewareImpl struct{}
 
 type Middleware interface {
 	AuthenticationMiddleware(next http.Handler) http.Handler
+	CORSHandle(next http.Handler) http.Handler
 }
 
 func NewMiddleware() Middleware {
