@@ -10,9 +10,10 @@ var GlobalCfg *Config
 
 type (
 	Config struct {
-		App         App    `json:"app"`
-		DB          DB     `json:"db"`
-		PasswordAlg string `json:"password_alg"`
+		App         App       `json:"app"`
+		DB          DB        `json:"db"`
+		Whitelist   Whitelist `json:"whitelist"`
+		PasswordAlg string    `json:"password_alg"`
 	}
 
 	App struct {
@@ -32,6 +33,15 @@ type (
 			Host     string `json:"host"`
 			Schema   string `json:"schema"`
 		} `json:"sql"`
+	}
+
+	Whitelist struct {
+		APIs []API `json:"API"`
+	}
+
+	API struct {
+		Endpoint string   `json:"endpoint"`
+		Methods  []string `json:"methods"`
 	}
 )
 

@@ -14,5 +14,13 @@
             "schema": ""
         }
     },
+    "whitelist": {
+        "api": [
+            {
+                "endpoint": "",
+                "methods": [] 
+            }
+        ]
+    },
     "password_alg": ""
 }
