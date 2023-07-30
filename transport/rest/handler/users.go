@@ -11,8 +11,8 @@ import (
 
 // CreateUsers handler
 // @Summary Create New User
-// @Description User registration endpoint
-// @Tags Users V1.0
+// @Description New User Registration
+// @Tags Users
 // @Produce json
 // @Param users body service.CreateUsersReq true "Request Create User"
 // @Success 200 {object} response.JSONResponse().APIStatusCreated()
@@ -118,7 +118,7 @@ func (h *HandlerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 // GetUsersWithPagination handler
 // @Summary GetUsersWithPagination
 // @Description GetUsersWithPagination for get users detail with limit
-// @Tags Users V1.0
+// @Tags Users
 // @Produce json
 // @Param name query string false "user fullname e.g John Doe"
 // @Param limit query int false "limit data; default 10"

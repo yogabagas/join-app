@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"github/yogabagas/join-app/pkg/cache"
 	authzRepo "github/yogabagas/join-app/service/authz/repository"
+	resourcesRepo "github/yogabagas/join-app/service/resources/repository"
 	rolesRepo "github/yogabagas/join-app/service/roles/repository"
 	usersRepo "github/yogabagas/join-app/service/users/repository"
 )
@@ -20,6 +21,7 @@ type RepositoryRegistryImpl struct {
 type RepositoryRegistry interface {
 	AuthzRepository() authzRepo.AuthzRepository
 	RolesRepository() rolesRepo.RolesRepository
+	ResourcesRepository() resourcesRepo.ResourcesRepository
 	UserRepository() usersRepo.UsersRepository
 
 	DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error)
@@ -41,6 +43,13 @@ func (r RepositoryRegistryImpl) RolesRepository() rolesRepo.RolesRepository {
 		return NewRolesRepository(r.dbExecutor)
 	}
 	return NewRolesRepository(r.db)
+}
+
+func (r RepositoryRegistryImpl) ResourcesRepository() resourcesRepo.ResourcesRepository {
+	if r.dbExecutor != nil {
+		return NewResourcesRepository(r.dbExecutor)
+	}
+	return NewResourcesRepository(r.db)
 }
 
 func (r RepositoryRegistryImpl) UserRepository() usersRepo.UsersRepository {
