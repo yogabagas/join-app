@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/pkg/cache"
 	"github/yogabagas/join-app/registry"
 	groupV1 "github/yogabagas/join-app/transport/rest/group/v1"
 	"github/yogabagas/join-app/transport/rest/handler"
@@ -27,6 +28,7 @@ type Option struct {
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 	Sql          *sql.DB
+	Cache        cache.Cache
 	Mux          *mux.Router
 }
 
@@ -51,6 +53,7 @@ func NewRest(o *Option) *Handler {
 
 	reg := registry.NewRegistry(
 		registry.NewSQLConn(o.Sql),
+		registry.NewCache(o.Cache),
 	)
 
 	appController := reg.NewAppController()
@@ -74,7 +77,7 @@ func NewRest(o *Option) *Handler {
 	r.PathPrefix("/health").HandlerFunc(handlerImpl.Healthcheck)
 
 	v1 := r.PathPrefix("/v1").Subrouter()
-	// v1.Use(middleware.AuthenticationMiddleware)
+	v1.Use(middleware.AuthenticationMiddleware)
 
 	groupV1.NewUsersV1(handlerImpl, v1)
 	groupV1.NewRolesV1(handlerImpl, v1)

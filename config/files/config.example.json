@@ -14,13 +14,20 @@
             "schema": ""
         }
     },
-    "whitelist": {
-        "api": [
-            {
-                "endpoint": "",
-                "methods": [] 
-            }
-        ]
-    },
-    "password_alg": ""
+    "cache": {
+        "redis": {
+            "user": "",
+            "password": "",
+            "host": ""
+        },
+        "whitelist": {
+            "api": [
+                {
+                    "endpoint": "",
+                    "methods": []
+                }
+            ]
+        },
+        "password_alg": ""
+    }
 }

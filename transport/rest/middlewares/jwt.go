@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github/yogabagas/join-app/config"
@@ -25,7 +26,7 @@ func NewMiddleware() Middleware {
 // AuthenticationMiddleware validates the JWT token.
 func (mi *MiddlewareImpl) AuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
+		ctx := context.Background()
 		if !mi.isWhitelist(r.URL.Path, r.Method) {
 			res := response.NewJSONResponse()
 
@@ -36,13 +37,15 @@ func (mi *MiddlewareImpl) AuthenticationMiddleware(next http.Handler) http.Handl
 				return
 			}
 
-			if !mi.parseJwt(token) {
+			valid, newCtx := mi.parseJwt(token, r)
+			if !valid {
 				res.SetError(response.ErrUnauthorized).SetMessage(errors.New("invalid authorized token").Error()).Send(w)
 				return
 			}
+			ctx = newCtx
 		}
 
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
@@ -64,7 +67,7 @@ func (mi *MiddlewareImpl) isWhitelist(endpoint, method string) bool {
 	return false
 }
 
-func (mi *MiddlewareImpl) parseJwt(authorizationHeader string) (valid bool) {
+func (mi *MiddlewareImpl) parseJwt(authorizationHeader string, r *http.Request) (valid bool, ctx context.Context) {
 	bearerToken := strings.Split(authorizationHeader, " ")
 	if len(bearerToken) == 2 {
 		token, _ := jwt.Parse(bearerToken[1], func(token *jwt.Token) (interface{}, error) {
@@ -74,7 +77,9 @@ func (mi *MiddlewareImpl) parseJwt(authorizationHeader string) (valid bool) {
 			return []byte(config.GlobalCfg.App.JwtSecret), nil
 		})
 
-		return token.Valid
+		ctx = context.WithValue(r.Context(), "user_data", token)
+
+		return token.Valid, ctx
 	}
-	return false
+	return false, ctx
 }
