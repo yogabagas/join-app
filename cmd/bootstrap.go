@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github/yogabagas/print-in/config"
-	"github/yogabagas/print-in/pkg/cache"
-	"github/yogabagas/print-in/pkg/cache/redis"
-	"github/yogabagas/print-in/pkg/database/sql"
-	"github/yogabagas/print-in/shared/constant"
+	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/pkg/cache"
+	"github/yogabagas/join-app/pkg/cache/redis"
+	"github/yogabagas/join-app/pkg/database/sql"
+	"github/yogabagas/join-app/shared/constant"
 	"net/url"
 )
 

@@ -2,8 +2,8 @@ package cache
 
 import (
 	"context"
-	"github/yogabagas/print-in/pkg/cache"
-	"github/yogabagas/print-in/service/users/repository"
+	"github/yogabagas/join-app/pkg/cache"
+	"github/yogabagas/join-app/service/users/repository"
 )
 
 type UsersRepositoryImpl struct {

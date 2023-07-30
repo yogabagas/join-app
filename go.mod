@@ -1,4 +1,4 @@
-module github/yogabagas/print-in
+module github/yogabagas/join-app
 
 go 1.20
 

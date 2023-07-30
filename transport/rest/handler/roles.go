@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	"github/yogabagas/print-in/domain/service"
-	"github/yogabagas/print-in/transport/rest/handler/response"
+	"github/yogabagas/join-app/domain/service"
+	"github/yogabagas/join-app/transport/rest/handler/response"
 	"net/http"
 )
 

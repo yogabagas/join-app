@@ -19,7 +19,15 @@
             "user": "",
             "password": "",
             "host": ""
-        }
-    },
-    "password_alg": ""
+        },
+        "whitelist": {
+            "api": [
+                {
+                    "endpoint": "",
+                    "methods": []
+                }
+            ]
+        },
+        "password_alg": ""
+    }
 }

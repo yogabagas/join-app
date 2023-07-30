@@ -22,5 +22,13 @@
             "host": "localhost:6379"
         }
     },
+    "whitelist": {
+        "api": [
+            {
+                "endpoint": "/v1/login",
+                "methods": ["POST"]
+            }
+        ]
+    },
     "password_alg": "sha"
 }

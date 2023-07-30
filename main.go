@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github/yogabagas/print-in/cmd"
+	"github/yogabagas/join-app/cmd"
 
-	_ "github/yogabagas/print-in/docs"
+	_ "github/yogabagas/join-app/docs"
 )
 
 // @title Mentoring Service API

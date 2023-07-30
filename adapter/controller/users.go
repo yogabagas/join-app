@@ -2,8 +2,8 @@ package controller
 
 import (
 	"context"
-	"github/yogabagas/print-in/domain/service"
-	"github/yogabagas/print-in/service/users/usecase"
+	"github/yogabagas/join-app/domain/service"
+	"github/yogabagas/join-app/service/users/usecase"
 )
 
 type UsersControllerImpl struct {
@@ -14,6 +14,7 @@ type UsersController interface {
 	CreateUsers(ctx context.Context, req service.CreateUsersReq) error
 	Login(ctx context.Context, req service.LoginReq) (*service.LoginRes, error)
 	Logout(ctx context.Context, userUUID string) (bool, error)
+	GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (service.GetUsersWithPaginationResp, error)
 }
 
 func NewUsersController(userSvc usecase.UsersService) UsersController {
@@ -30,4 +31,8 @@ func (uc *UsersControllerImpl) Login(ctx context.Context, req service.LoginReq) 
 
 func (uc *UsersControllerImpl) Logout(ctx context.Context, userUUID string) (bool, error) {
 	return uc.usersSvc.Logout(ctx, userUUID)
+}
+
+func (uc *UsersControllerImpl) GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (service.GetUsersWithPaginationResp, error) {
+	return uc.usersSvc.GetUsersWithPagination(ctx, req)
 }

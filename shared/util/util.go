@@ -5,7 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
-	"github/yogabagas/print-in/shared/constant"
+	"github/yogabagas/join-app/shared/constant"
 	"math/rand"
 	"regexp"
 	"time"
@@ -56,4 +56,17 @@ func ValidateEmail(email string) bool {
 	var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
 	return emailRegex.MatchString(email)
+}
+
+func PageToOffset(limit int, page int) int {
+
+	if page <= 1 {
+		return 0
+	}
+
+	return (limit * page) - limit
+}
+
+func GetTotalPage(totalData int, perPage int) int {
+	return (totalData + perPage - 1) / perPage
 }

@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github/yogabagas/print-in/config"
-	"github/yogabagas/print-in/transport/rest/handler/response"
+	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/transport/rest/handler/response"
 	"net/http"
 	"strings"
 
@@ -16,34 +16,55 @@ type MiddlewareImpl struct{}
 
 type Middleware interface {
 	AuthenticationMiddleware(next http.Handler) http.Handler
+	CORSHandle(next http.Handler) http.Handler
 }
 
 func NewMiddleware() Middleware {
 	return &MiddlewareImpl{}
 }
 
-var res = response.NewJSONResponse()
-
 // AuthenticationMiddleware validates the JWT token.
 func (mi *MiddlewareImpl) AuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.Background()
+		if !mi.isWhitelist(r.URL.Path, r.Method) {
+			res := response.NewJSONResponse()
 
-		token := r.Header.Get("Authorization")
+			token := r.Header.Get("Authorization")
 
-		isRegister := r.URL.Path == "/v1/users" && r.Method == http.MethodPost
+			if token == "" {
+				res.SetError(response.ErrUnauthorized).SetMessage(errors.New("authorization header is required").Error()).Send(w)
+				return
+			}
 
-		if token == "" && !isRegister {
-			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("An Authorization Header is required").Error()).Send(w)
-			return
-		}
-		valid, ctx := mi.parseJwt(token, r)
-		if !valid && !isRegister {
-			res.SetError(response.ErrUnauthorized).SetMessage(errors.New("Invalid Authorized Token").Error()).Send(w)
-			return
+			valid, newCtx := mi.parseJwt(token, r)
+			if !valid {
+				res.SetError(response.ErrUnauthorized).SetMessage(errors.New("invalid authorized token").Error()).Send(w)
+				return
+			}
+			ctx = newCtx
 		}
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func (mi *MiddlewareImpl) isWhitelist(endpoint, method string) bool {
+	mapAPI := make(map[string][]string)
+
+	for _, v := range config.GlobalCfg.Whitelist.APIs {
+		mapAPI[v.Endpoint] = append(mapAPI[v.Endpoint], v.Methods...)
+	}
+
+	if methods, ok := mapAPI[endpoint]; ok {
+		for _, m := range methods {
+			if method == m {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (mi *MiddlewareImpl) parseJwt(authorizationHeader string, r *http.Request) (valid bool, ctx context.Context) {

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"github/yogabagas/print-in/domain/service"
+	"github/yogabagas/join-app/domain/service"
 	"net/http"
 )
 

@@ -2,10 +2,10 @@ package registry
 
 import (
 	"database/sql"
-	"github/yogabagas/print-in/adapter/controller"
-	repoCache "github/yogabagas/print-in/domain/repository/cache"
-	repo "github/yogabagas/print-in/domain/repository/sql"
-	"github/yogabagas/print-in/pkg/cache"
+	"github/yogabagas/join-app/adapter/controller"
+	repoCache "github/yogabagas/join-app/domain/repository/cache"
+	repo "github/yogabagas/join-app/domain/repository/sql"
+	"github/yogabagas/join-app/pkg/cache"
 )
 
 type module struct {

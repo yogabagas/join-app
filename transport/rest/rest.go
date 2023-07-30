@@ -3,12 +3,12 @@ package rest
 import (
 	"database/sql"
 	"fmt"
-	"github/yogabagas/print-in/config"
-	"github/yogabagas/print-in/pkg/cache"
-	"github/yogabagas/print-in/registry"
-	groupV1 "github/yogabagas/print-in/transport/rest/group/v1"
-	"github/yogabagas/print-in/transport/rest/handler"
-	"github/yogabagas/print-in/transport/rest/middlewares"
+	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/pkg/cache"
+	"github/yogabagas/join-app/registry"
+	groupV1 "github/yogabagas/join-app/transport/rest/group/v1"
+	"github/yogabagas/join-app/transport/rest/handler"
+	"github/yogabagas/join-app/transport/rest/middlewares"
 	"log"
 	"net/http"
 	"os"
@@ -16,7 +16,7 @@ import (
 	"syscall"
 	"time"
 
-	_ "github/yogabagas/print-in/docs"
+	_ "github/yogabagas/join-app/docs"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 
@@ -64,6 +64,7 @@ func NewRest(o *Option) *Handler {
 	}
 
 	r := mux.NewRouter()
+	r.Use(middleware.CORSHandle)
 
 	URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
 

@@ -5,15 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt"
-	"github/yogabagas/print-in/config"
-	"github/yogabagas/print-in/domain/model"
-	"github/yogabagas/print-in/domain/repository/cache"
-	"github/yogabagas/print-in/domain/repository/sql"
-	"github/yogabagas/print-in/domain/service"
-	authzRepo "github/yogabagas/print-in/service/authz/repository"
-	rolesRepo "github/yogabagas/print-in/service/roles/repository"
-	usersRepo "github/yogabagas/print-in/service/users/repository"
-	"github/yogabagas/print-in/shared/util"
+	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/domain/model"
+	"github/yogabagas/join-app/domain/repository/cache"
+	"github/yogabagas/join-app/domain/repository/sql"
+	"github/yogabagas/join-app/domain/service"
+	authzRepo "github/yogabagas/join-app/service/authz/repository"
+	rolesRepo "github/yogabagas/join-app/service/roles/repository"
+	"github/yogabagas/join-app/service/users/presenter"
+	usersRepo "github/yogabagas/join-app/service/users/repository"
+	"github/yogabagas/join-app/shared/util"
+
+	"github/yogabagas/join-app/shared/constant"
 	"log"
 	"time"
 )
@@ -23,20 +26,23 @@ type UsersServiceImpl struct {
 	rolesRepo   rolesRepo.RolesRepository
 	usersRepo   usersRepo.UsersRepository
 	sessionRepo usersRepo.SessionRepository
+	presenter   presenter.UsersPresenter
 }
 
 type UsersService interface {
 	CreateUsers(ctx context.Context, req service.CreateUsersReq) error
 	Login(ctx context.Context, req service.LoginReq) (*service.LoginRes, error)
 	Logout(ctx context.Context, userUUID string) (bool, error)
+	GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (service.GetUsersWithPaginationResp, error)
 }
 
-func NewUsersService(repository sql.RepositoryRegistry, sessionRepository cache.RepositoryRegistry) UsersService {
+func NewUsersService(repository sql.RepositoryRegistry, sessionRepository cache.RepositoryRegistry, presenter presenter.UsersPresenter) UsersService {
 	return &UsersServiceImpl{
 		authzRepo:   repository.AuthzRepository(),
 		rolesRepo:   repository.RolesRepository(),
 		usersRepo:   repository.UserRepository(),
 		sessionRepo: sessionRepository.SessionRepository(),
+		presenter:   presenter,
 	}
 }
 
@@ -153,4 +159,25 @@ func (us *UsersServiceImpl) CreateToken(ttl time.Duration, user *model.Session) 
 	}
 
 	return tokenString, nil
+}
+
+func (us *UsersServiceImpl) GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (resp service.GetUsersWithPaginationResp, err error) {
+
+	users, err := us.usersRepo.ReadUsersWithPagination(ctx, &model.ReadUsersWithPaginationReq{
+		Fullname: req.Fullname,
+		Limit:    req.Limit,
+		Offset:   util.PageToOffset(req.Limit, req.Page),
+	})
+	if err != nil {
+		return
+	}
+
+	count, err := us.usersRepo.CountUsers(ctx, &model.CountUsersReq{
+		IsDeleted: constant.False.Int(),
+	})
+	if err != nil {
+		return
+	}
+
+	return us.presenter.GetUsersWithPagination(ctx, req, users, count)
 }

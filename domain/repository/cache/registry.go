@@ -2,8 +2,8 @@ package cache
 
 import (
 	"database/sql"
-	"github/yogabagas/print-in/pkg/cache"
-	usersRepo "github/yogabagas/print-in/service/users/repository"
+	"github/yogabagas/join-app/pkg/cache"
+	usersRepo "github/yogabagas/join-app/service/users/repository"
 )
 
 type RepositoryRegistryImpl struct {

@@ -1,6 +1,6 @@
 package redis
 
-import "github/yogabagas/print-in/pkg/cache"
+import "github/yogabagas/join-app/pkg/cache"
 
 const (
 	schemaDefault = "redis"

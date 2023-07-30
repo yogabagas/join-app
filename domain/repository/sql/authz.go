@@ -2,8 +2,8 @@ package sql
 
 import (
 	"context"
-	"github/yogabagas/print-in/domain/model"
-	"github/yogabagas/print-in/service/authz/repository"
+	"github/yogabagas/join-app/domain/model"
+	"github/yogabagas/join-app/service/authz/repository"
 	"time"
 )
 

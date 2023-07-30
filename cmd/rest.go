@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github/yogabagas/print-in/config"
-	"github/yogabagas/print-in/transport/rest"
+	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/transport/rest"
 	"log"
 	"os"
 	"time"

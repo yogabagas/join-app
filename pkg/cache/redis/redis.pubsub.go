@@ -2,7 +2,7 @@ package redis
 
 import (
 	"context"
-	"github/yogabagas/print-in/pkg/cache"
+	"github/yogabagas/join-app/pkg/cache"
 
 	"github.com/go-redis/redis/v8"
 )

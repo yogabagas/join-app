@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github/yogabagas/print-in/pkg/config"
+	"github/yogabagas/join-app/pkg/config"
 	"log"
 	"os"
 )
@@ -10,10 +10,11 @@ var GlobalCfg *Config
 
 type (
 	Config struct {
-		App         App    `json:"app"`
-		DB          DB     `json:"db"`
-		Cache       Cache  `json:"cache"`
-		PasswordAlg string `json:"password_alg"`
+		App         App       `json:"app"`
+		DB          DB        `json:"db"`
+		Cache       Cache     `json:"cache"`
+		Whitelist   Whitelist `json:"whitelist"`
+		PasswordAlg string    `json:"password_alg"`
 	}
 
 	App struct {
@@ -23,6 +24,7 @@ type (
 		ReadTimeout  int    `json:"read_timeout"`
 		WriteTimeout int    `json:"write_timeout"`
 		JwtSecret    string `json:"jwt_secret"`
+		LogLevel     string `json:"log_level"`
 	}
 
 	DB struct {
@@ -40,6 +42,14 @@ type (
 			Password string `json:"password"`
 			Host     string `json:"host"`
 		} `json:"redis"`
+	}
+	Whitelist struct {
+		APIs []API `json:"API"`
+	}
+
+	API struct {
+		Endpoint string   `json:"endpoint"`
+		Methods  []string `json:"methods"`
 	}
 )
 

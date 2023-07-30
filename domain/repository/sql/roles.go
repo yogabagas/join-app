@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
-	"github/yogabagas/print-in/domain/model"
-	"github/yogabagas/print-in/service/roles/repository"
+	"github/yogabagas/join-app/domain/model"
+	"github/yogabagas/join-app/service/roles/repository"
 )
 
 const (
