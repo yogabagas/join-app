@@ -7,6 +7,16 @@ import (
 	"net/http"
 )
 
+// CreateRoles handler
+// @Summary Create New Roles
+// @Description Roles registration endpoint
+// @Tags Roles
+// @Produce json
+// @Param users body service.CreateRolesReq true "Request Create Role"
+// @Success 200 {object} response.JSONResponse().APIStatusCreated()
+// @Failure 400 {object} response.JSONResponse
+// @Failure 500 {object} response.JSONResponse
+// @Router /v1/roles [POST]
 func (h *HandlerImpl) CreateRoles(w http.ResponseWriter, r *http.Request) {
 
 	res := response.NewJSONResponse()

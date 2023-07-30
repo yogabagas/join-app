@@ -24,15 +24,10 @@ func (rs *RolesServiceImpl) CreateRoles(ctx context.Context, req service.CreateR
 
 	uID := util.NewULIDGenerate()
 
-	err := rs.rolesRepo.CreateRoles(ctx, &model.Role{
+	return rs.rolesRepo.CreateRoles(ctx, &model.Role{
 		UID:       uID,
 		Name:      req.Name,
 		CreatedBy: req.CreatedBy,
 		UpdatedBy: req.CreatedBy,
 	})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

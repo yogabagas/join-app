@@ -51,7 +51,8 @@ func (m *module) NewSessionRepositoryRegistry() repoCache.RepositoryRegistry {
 
 func (m *module) NewAppController() controller.AppController {
 	return controller.AppController{
-		UsersController: m.NewUsersController(),
-		RolesController: m.NewRolesController(),
+		UsersController:     m.NewUsersController(),
+		RolesController:     m.NewRolesController(),
+		ResourcesController: m.NewResourcesController(),
 	}
 }
