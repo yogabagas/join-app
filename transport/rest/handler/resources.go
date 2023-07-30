@@ -7,17 +7,17 @@ import (
 	"net/http"
 )
 
-// CreateRoles handler
-// @Summary Create New Roles
-// @Description Roles registration endpoint
-// @Tags Roles
+// CreateResources handler
+// @Summary Create New Resources
+// @Description New Resources Registration
+// @Tags Resources
 // @Produce json
-// @Param users body service.CreateRolesReq true "Request Create Role"
+// @Param users body service.CreateResourcesReq true "Request Create Resources"
 // @Success 200 {object} response.JSONResponse().APIStatusCreated()
 // @Failure 400 {object} response.JSONResponse
 // @Failure 500 {object} response.JSONResponse
-// @Router /v1/roles [POST]
-func (h *HandlerImpl) CreateRoles(w http.ResponseWriter, r *http.Request) {
+// @Router /v1/resources [POST]
+func (h *HandlerImpl) CreateResources(w http.ResponseWriter, r *http.Request) {
 
 	res := response.NewJSONResponse()
 
@@ -26,17 +26,19 @@ func (h *HandlerImpl) CreateRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req service.CreateRolesReq
+	var req service.CreateResourcesReq
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
 		return
 	}
 
-	if err := h.Controller.RolesController.CreateRoles(r.Context(), req); err != nil {
+	err := h.Controller.ResourcesController.CreateResources(r.Context(), req)
+	if err != nil {
 		res.SetError(response.ErrInternalServerError).SetMessage(err.Error()).Send(w)
 		return
 	}
 
 	res.APIStatusCreated().Send(w)
+
 }

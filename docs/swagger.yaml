@@ -17,6 +17,24 @@ definitions:
       status_code:
         type: integer
     type: object
+  service.CreateResourcesReq:
+    properties:
+      action:
+        type: string
+      name:
+        type: string
+      parent_uid:
+        type: string
+      type:
+        type: integer
+    type: object
+  service.CreateRolesReq:
+    properties:
+      created_by:
+        type: string
+      name:
+        type: string
+    type: object
   service.CreateUsersReq:
     properties:
       birthdate:
@@ -72,7 +90,7 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: Mentoring Service API
+  description: Join App API
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -80,6 +98,62 @@ info:
   title: Join App API
   version: "1.0"
 paths:
+  /v1/resources:
+    post:
+      description: New Resources Registration
+      parameters:
+      - description: Request Create Resources
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateResourcesReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: Create New Resources
+      tags:
+      - Resources
+  /v1/roles:
+    post:
+      description: Roles registration endpoint
+      parameters:
+      - description: Request Create Role
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateRolesReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.JSONResponse'
+      summary: Create New Roles
+      tags:
+      - Roles
   /v1/users:
     get:
       description: GetUsersWithPagination for get users detail with limit
@@ -118,9 +192,9 @@ paths:
             $ref: '#/definitions/response.JSONResponse'
       summary: GetUsersWithPagination
       tags:
-      - Users V1.0
+      - Users
     post:
-      description: User registration endpoint
+      description: New User Registration
       parameters:
       - description: Request Create User
         in: body
@@ -145,5 +219,5 @@ paths:
             $ref: '#/definitions/response.JSONResponse'
       summary: Create New User
       tags:
-      - Users V1.0
+      - Users
 swagger: "2.0"

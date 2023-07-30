@@ -8,6 +8,8 @@ type (
 	Role int
 
 	IsDeleted int
+
+	ResourcesType int
 )
 
 var (
@@ -23,6 +25,9 @@ var (
 
 	False IsDeleted = 0
 	True  IsDeleted = 1
+
+	Menu ResourcesType = 1
+	API  ResourcesType = 2
 )
 
 func (pa PassAlgorithm) String() string {

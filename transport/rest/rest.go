@@ -40,7 +40,7 @@ type Handler struct {
 // NewRest
 // @title Join App API
 // @version 1.0
-// @description Mentoring Service API
+// @description Join App API
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.url http://www.swagger.io/support
@@ -81,6 +81,7 @@ func NewRest(o *Option) *Handler {
 
 	groupV1.NewUsersV1(handlerImpl, v1)
 	groupV1.NewRolesV1(handlerImpl, v1)
+	groupV1.NewResourcesV1(handlerImpl, v1)
 
 	o.Mux = r
 

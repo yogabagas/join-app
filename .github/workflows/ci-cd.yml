@@ -47,6 +47,7 @@ jobs:
             docker pull yogabagas/join-app:latest
             docker-compose -f docker-compose-app-prod.yml down --remove-orphans
             docker-compose -f docker-compose-db-prod.yml up -d
+            docker-compose -f docker-compose-cache-prod.yml up -d
             docker-compose -f docker-compose-app-prod.yml up -d
             docker image prune -f
             docker cp config/config.prod.json join-app:/app/config/files/config.prod.json
