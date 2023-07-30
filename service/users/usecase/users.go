@@ -3,39 +3,46 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/golang-jwt/jwt"
 	"github/yogabagas/join-app/config"
 	"github/yogabagas/join-app/domain/model"
+	"github/yogabagas/join-app/domain/repository/cache"
 	"github/yogabagas/join-app/domain/repository/sql"
 	"github/yogabagas/join-app/domain/service"
 	authzRepo "github/yogabagas/join-app/service/authz/repository"
 	rolesRepo "github/yogabagas/join-app/service/roles/repository"
 	"github/yogabagas/join-app/service/users/presenter"
 	usersRepo "github/yogabagas/join-app/service/users/repository"
+	"github/yogabagas/join-app/shared/util"
 
 	"github/yogabagas/join-app/shared/constant"
-	"github/yogabagas/join-app/shared/util"
 	"log"
 	"time"
 )
 
 type UsersServiceImpl struct {
-	authzRepo authzRepo.AuthzRepository
-	rolesRepo rolesRepo.RolesRepository
-	usersRepo usersRepo.UsersRepository
-	presenter presenter.UsersPresenter
+	authzRepo   authzRepo.AuthzRepository
+	rolesRepo   rolesRepo.RolesRepository
+	usersRepo   usersRepo.UsersRepository
+	sessionRepo usersRepo.SessionRepository
+	presenter   presenter.UsersPresenter
 }
 
 type UsersService interface {
 	CreateUsers(ctx context.Context, req service.CreateUsersReq) error
+	Login(ctx context.Context, req service.LoginReq) (*service.LoginRes, error)
+	Logout(ctx context.Context, userUUID string) (bool, error)
 	GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (service.GetUsersWithPaginationResp, error)
 }
 
-func NewUsersService(repository sql.RepositoryRegistry, presenter presenter.UsersPresenter) UsersService {
+func NewUsersService(repository sql.RepositoryRegistry, sessionRepository cache.RepositoryRegistry, presenter presenter.UsersPresenter) UsersService {
 	return &UsersServiceImpl{
-		authzRepo: repository.AuthzRepository(),
-		rolesRepo: repository.RolesRepository(),
-		usersRepo: repository.UserRepository(),
-		presenter: presenter,
+		authzRepo:   repository.AuthzRepository(),
+		rolesRepo:   repository.RolesRepository(),
+		usersRepo:   repository.UserRepository(),
+		sessionRepo: sessionRepository.SessionRepository(),
+		presenter:   presenter,
 	}
 }
 
@@ -93,6 +100,65 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 		return err
 	}
 	return nil
+}
+
+func (us *UsersServiceImpl) Login(ctx context.Context, req service.LoginReq) (*service.LoginRes, error) {
+	user, err := us.usersRepo.ReadUserByEmail(ctx, req.Email)
+
+	pwd, err := util.Hash(config.GlobalCfg.PasswordAlg, req.Password)
+
+	if util.Base64(pwd) != user.Password {
+		return nil, errors.New("Invalid Password")
+	}
+
+	accessToken, err := us.CreateToken(24, user)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, err := us.CreateToken(24, user)
+	if err != nil {
+		return nil, err
+	}
+
+	err = us.sessionRepo.CreateSession(ctx, user.UserUID)
+	if err != nil {
+		return nil, err
+	}
+
+	data := service.LoginRes{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+
+	return &data, err
+}
+
+func (us *UsersServiceImpl) Logout(ctx context.Context, userUUID string) (bool, error) {
+	err := us.sessionRepo.DeleteSession(ctx, userUUID)
+	if err != nil {
+		return false, err
+	}
+
+	return true, err
+}
+
+func (us *UsersServiceImpl) CreateToken(ttl time.Duration, user *model.Session) (string, error) {
+	now := time.Now().UTC()
+	claims := make(jwt.MapClaims)
+	claims["user_uuid"] = user.UserUID
+	claims["role_uuid"] = user.RoleUID
+	claims["exp"] = now.Add(ttl * time.Hour).Unix()
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	tokenString, err := token.SignedString([]byte(config.GlobalCfg.App.JwtSecret))
+
+	if err != nil {
+		return "", fmt.Errorf("create: sign token: %w", err)
+	}
+
+	return tokenString, nil
 }
 
 func (us *UsersServiceImpl) GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (resp service.GetUsersWithPaginationResp, err error) {

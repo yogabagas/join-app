@@ -11,6 +11,16 @@ type CreateUsersReq struct {
 	CreatedBy string `json:"-"`
 }
 
+type LoginReq struct {
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type LoginRes struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 type GetUsersWithPaginationReq struct {
 	Fullname string `json:"name"`
 	Limit    int    `json:"limit"`
