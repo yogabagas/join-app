@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github/yogabagas/join-app/config"
-	"github/yogabagas/join-app/pkg/cache"
 	"github/yogabagas/join-app/registry"
 	groupV1 "github/yogabagas/join-app/transport/rest/group/v1"
 	"github/yogabagas/join-app/transport/rest/handler"
@@ -18,6 +17,7 @@ import (
 
 	_ "github/yogabagas/join-app/docs"
 
+	"github.com/go-redis/redis/v8"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	"github.com/gorilla/mux"
@@ -28,7 +28,7 @@ type Option struct {
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 	Sql          *sql.DB
-	Cache        cache.Cache
+	Redis        *redis.Client
 	Mux          *mux.Router
 }
 
@@ -53,7 +53,7 @@ func NewRest(o *Option) *Handler {
 
 	reg := registry.NewRegistry(
 		registry.NewSQLConn(o.Sql),
-		registry.NewCache(o.Cache),
+		registry.NewCache(o.Redis),
 	)
 
 	appController := reg.NewAppController()
@@ -79,6 +79,7 @@ func NewRest(o *Option) *Handler {
 	v1 := r.PathPrefix("/v1").Subrouter()
 	v1.Use(middleware.AuthenticationMiddleware)
 
+	groupV1.NewAuthzV1(handlerImpl, v1)
 	groupV1.NewUsersV1(handlerImpl, v1)
 	groupV1.NewRolesV1(handlerImpl, v1)
 	groupV1.NewResourcesV1(handlerImpl, v1)

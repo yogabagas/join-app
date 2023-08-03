@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
-	"github/yogabagas/join-app/pkg/cache"
 	authzRepo "github/yogabagas/join-app/service/authz/repository"
+	jwkRepo "github/yogabagas/join-app/service/jwk/repository"
 	resourcesRepo "github/yogabagas/join-app/service/resources/repository"
 	rolesRepo "github/yogabagas/join-app/service/roles/repository"
 	usersRepo "github/yogabagas/join-app/service/users/repository"
@@ -14,12 +14,12 @@ type InTransaction func(RepositoryRegistry) (interface{}, error)
 
 type RepositoryRegistryImpl struct {
 	db         *sql.DB
-	cache      cache.Cache
 	dbExecutor DBExecutor
 }
 
 type RepositoryRegistry interface {
 	AuthzRepository() authzRepo.AuthzRepository
+	JWKRepository() jwkRepo.JWKRepository
 	RolesRepository() rolesRepo.RolesRepository
 	ResourcesRepository() resourcesRepo.ResourcesRepository
 	UserRepository() usersRepo.UsersRepository
@@ -27,8 +27,8 @@ type RepositoryRegistry interface {
 	DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error)
 }
 
-func NewRepositoryRegistry(db *sql.DB, cache cache.Cache) RepositoryRegistry {
-	return &RepositoryRegistryImpl{db: db, cache: cache}
+func NewRepositoryRegistry(db *sql.DB) RepositoryRegistry {
+	return &RepositoryRegistryImpl{db: db}
 }
 
 func (r RepositoryRegistryImpl) AuthzRepository() authzRepo.AuthzRepository {
@@ -36,6 +36,13 @@ func (r RepositoryRegistryImpl) AuthzRepository() authzRepo.AuthzRepository {
 		return NewAuthzRepository(r.dbExecutor)
 	}
 	return NewAuthzRepository(r.db)
+}
+
+func (r RepositoryRegistryImpl) JWKRepository() jwkRepo.JWKRepository {
+	if r.dbExecutor != nil {
+		return NewJWKRepository(r.dbExecutor)
+	}
+	return NewJWKRepository(r.db)
 }
 
 func (r RepositoryRegistryImpl) RolesRepository() rolesRepo.RolesRepository {
@@ -54,9 +61,9 @@ func (r RepositoryRegistryImpl) ResourcesRepository() resourcesRepo.ResourcesRep
 
 func (r RepositoryRegistryImpl) UserRepository() usersRepo.UsersRepository {
 	if r.dbExecutor != nil {
-		return NewUsersRepository(r.dbExecutor, r.cache)
+		return NewUsersRepository(r.dbExecutor)
 	}
-	return NewUsersRepository(r.db, r.cache)
+	return NewUsersRepository(r.db)
 }
 
 func (r RepositoryRegistryImpl) DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error) {

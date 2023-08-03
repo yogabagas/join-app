@@ -16,22 +16,22 @@ services:
       - fullstack
   
   db:
-      image: mysql
-      restart: on-failure
-      container_name: joindb
-      ports:
-        - 3306:3306
-        - 33060:33060
-      environment:
-        - MYSQL_DATABASE=joindb
-        - MYSQL_ROOT_PASSWORD=root
-      volumes:
-        - database_mysql:/var/lib/mysql
-      networks:
-        - fullstack
+    image: mysql
+    restart: on-failure
+    container_name: joindb
+    ports:
+      - 3306:3306
+      - 33060:33060
+    environment:
+      - MYSQL_DATABASE=joindb
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - database_mysql:/var/lib/mysql
+    networks:
+      - fullstack
 
   cache:
-    image: redis:6.2-alpine
+    image: redis
     restart: always
     ports:
       - '6379:6379'

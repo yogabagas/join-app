@@ -44,52 +44,12 @@ func (h *HandlerImpl) CreateUsers(w http.ResponseWriter, r *http.Request) {
 	res.APIStatusCreated().Send(w)
 }
 
-// Login handler
-// @Summary Login
-// @Description Login registration endpoint
-// @Tags Users V1.0
-// @Produce json
-// @Param users body service.LoginReq true "Request Login"
-// @Success 200 {object} response.JSONResponse().APIStatusSuccess()
-// @Failure 400 {object} response.JSONResponse
-// @Failure 500 {object} response.JSONResponse
-// @Router /v1/login [POST]
-func (h *HandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
-
-	res := response.NewJSONResponse()
-
-	if r.Method != http.MethodPost {
-		res.SetError(response.ErrMethodNotAllowed).Send(w)
-		return
-	}
-
-	var req service.LoginReq
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
-		return
-	}
-
-	if !util.ValidateEmail(req.Email) {
-		res.SetError(response.ErrBadRequest).SetMessage("Invalid Email Format").Send(w)
-		return
-	}
-
-	user, err := h.Controller.UsersController.Login(r.Context(), req)
-	if err != nil {
-		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
-		return
-	}
-
-	res.APIStatusSuccess().SetResult(user).Send(w)
-}
-
 // Logout handler
-// @Summary Login
-// @Description Login registration endpoint
-// @Tags Users V1.0
+// @Summary Lgout
+// @Description Logout endpoint
+// @Tags Users
 // @Produce json
-// @Param users body true "Request Logout"
+//
 // @Success 200 {object} response.JSONResponse().APIStatusSuccess()
 // @Failure 400 {object} response.JSONResponse
 // @Failure 500 {object} response.JSONResponse
@@ -102,17 +62,26 @@ func (h *HandlerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userData := new(util.UserData)
-	userData = userData.GetUserData(r)
+	token := r.Header.Get("Authorization")
 
-	_, err := h.Controller.UsersController.Logout(r.Context(), userData.UserUUID)
+	claims, err := util.GetUserData(token)
+	if err != nil {
+		res.SetError(response.ErrUnauthorized).SetMessage(err.Error()).Send(w)
+		return
+	}
+
+	req := service.LogoutReq{
+		UserUID: claims.UserUID,
+	}
+
+	err = h.Controller.UsersController.Logout(r.Context(), req)
 
 	if err != nil {
 		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
 		return
 	}
 
-	res.SetStatusCode(204).Send(w)
+	res.APIStatusNoContent().Send(w)
 }
 
 // GetUsersWithPagination handler

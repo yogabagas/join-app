@@ -10,11 +10,14 @@ var GlobalCfg *Config
 
 type (
 	Config struct {
-		App         App       `json:"app"`
-		DB          DB        `json:"db"`
-		Cache       Cache     `json:"cache"`
-		Whitelist   Whitelist `json:"whitelist"`
-		PasswordAlg string    `json:"password_alg"`
+		App                    App       `json:"app"`
+		DB                     DB        `json:"db"`
+		Cache                  Cache     `json:"cache"`
+		Whitelist              Whitelist `json:"whitelist"`
+		JWK                    JWK       `json:"jwk"`
+		PasswordAlg            string    `json:"password_alg"`
+		TokenExpiration        int       `json:"token_exp"`
+		RefreshTokenExpiration int       `json:"refresh_token_exp"`
 	}
 
 	App struct {
@@ -23,8 +26,7 @@ type (
 		Port         string `json:"port"`
 		ReadTimeout  int    `json:"read_timeout"`
 		WriteTimeout int    `json:"write_timeout"`
-		JwtSecret    string `json:"jwt_secret"`
-		LogLevel     string `json:"log_level"`
+		JWTSecret    string `json:"jwt_secret"`
 	}
 
 	DB struct {
@@ -50,6 +52,14 @@ type (
 	API struct {
 		Endpoint string   `json:"endpoint"`
 		Methods  []string `json:"methods"`
+	}
+
+	JWK struct {
+		Size      int    `json:"size"`
+		KeyID     string `json:"key_id"`
+		Algorithm string `json:"alg"`
+		Use       string `json:"use"`
+		Expired   int    `json:"ttl_in_hours"`
 	}
 )
 

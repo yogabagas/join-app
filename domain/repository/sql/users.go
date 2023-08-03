@@ -6,7 +6,6 @@ import (
 
 	"fmt"
 	"github/yogabagas/join-app/domain/model"
-	"github/yogabagas/join-app/pkg/cache"
 	"github/yogabagas/join-app/service/users/repository"
 	"strings"
 )
@@ -14,7 +13,8 @@ import (
 const (
 	insertUsers = `INSERT INTO users (uid, first_name, last_name, email, birthdate, username, password, created_by, updated_by) 
 	VALUES (?,?,?,?,?,?,?,?,?)`
-	selectByEmail             = `select a.user_uid, a.role_uid, u.password  from users u join authz a on u.uid  = a.user_uid where email = ? `
+	selectUsersByEmailPassword = `SELECT u.uid, a.role_uid, a.last_active FROM users u JOIN authz a ON u.uid = a.user_uid 
+	JOIN roles r ON a.role_uid = r.uid WHERE u.email = ? AND u.password = ? AND r.id = ?`
 	selectUsersWithPagination = `SELECT u.uid, u.first_name, u.last_name, u.email, u.birthdate, u.username, u.created_at, 
 	(SELECT COUNT(*) from users us WHERE us.id = u.id) as per_page, r.name as role_name FROM users u JOIN authz a ON u.uid = a.user_uid 
 	JOIN roles r ON a.role_uid = r.uid %s`
@@ -22,12 +22,11 @@ const (
 )
 
 type UsersRepositoryImpl struct {
-	db    DBExecutor
-	cache cache.Cache
+	db DBExecutor
 }
 
-func NewUsersRepository(db DBExecutor, cache cache.Cache) repository.UsersRepository {
-	return &UsersRepositoryImpl{db: db, cache: cache}
+func NewUsersRepository(db DBExecutor) repository.UsersRepository {
+	return &UsersRepositoryImpl{db: db}
 }
 
 func (ur *UsersRepositoryImpl) CreateUsers(ctx context.Context, req *model.User) error {
@@ -41,12 +40,16 @@ func (ur *UsersRepositoryImpl) CreateUsers(ctx context.Context, req *model.User)
 	return nil
 }
 
-func (ur *UsersRepositoryImpl) ReadUserByEmail(ctx context.Context, email string) (resp *model.Session, err error) {
-	resp = &model.Session{}
-	err = ur.db.QueryRowContext(ctx, selectByEmail, email).
-		Scan(&resp.UserUID, &resp.RoleUID, &resp.Password)
+func (ur *UsersRepositoryImpl) ReadUserByEmailPassword(ctx context.Context, req *model.ReadUserByEmailPasswordReq) (resp *model.ReadUserByEmailPasswordResp, err error) {
+	resp = &model.ReadUserByEmailPasswordResp{}
 
-	return resp, err
+	err = ur.db.QueryRowContext(ctx, selectUsersByEmailPassword, req.Email, req.Password, req.RoleID).
+		Scan(&resp.UserUID, &resp.RoleUID, &resp.LastActive)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+
+	return
 }
 
 func (ur *UsersRepositoryImpl) ReadUsersWithPagination(ctx context.Context, req *model.ReadUsersWithPaginationReq) (resp *model.ReadUsersWithPaginationResp, err error) {
@@ -81,14 +84,6 @@ func (ur *UsersRepositoryImpl) ReadUsersWithPagination(ctx context.Context, req 
 		resp.Users = append(resp.Users, user)
 	}
 	return resp, nil
-}
-
-func (ur *UsersRepositoryImpl) CreateSession(ctx context.Context, userUUID string) error {
-	return ur.cache.Set(ctx, "user_uuid:"+userUUID, true, 86400)
-}
-
-func (ur *UsersRepositoryImpl) DeleteSession(ctx context.Context, userUUID string) error {
-	return ur.cache.Delete(ctx, "user_uuid:"+userUUID)
 }
 
 func (ur *UsersRepositoryImpl) CountUsers(ctx context.Context, req *model.CountUsersReq) (resp *model.CountUsersResp, err error) {

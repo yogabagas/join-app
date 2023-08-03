@@ -55,3 +55,35 @@ type CountUsersReq struct {
 type CountUsersResp struct {
 	Total int
 }
+
+type GenerateAccessTokenReq struct {
+	UserUID    string
+	RoleUID    string
+	LastActive int
+	ExpiredAt  int
+}
+
+type GenerateAccessTokenResp struct {
+	Token string
+}
+
+type GenerateRefreshTokenReq struct {
+	UserUID   string
+	ExpiredAt int
+}
+
+type GenerateRefreshTokenResp struct {
+	Token string
+}
+
+type ReadUserByEmailPasswordReq struct {
+	Email    string
+	Password string
+	RoleID   int
+}
+
+type ReadUserByEmailPasswordResp struct {
+	UserUID    string
+	RoleUID    string
+	LastActive time.Time
+}

@@ -14,11 +14,16 @@ type CreateUsersReq struct {
 type LoginReq struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
+	RoleID   int    `json:"role_id" validate:"required"`
 }
 
-type LoginRes struct {
+type LoginResp struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
+}
+
+type LogoutReq struct {
+	UserUID string `json:"user_uid"`
 }
 
 type GetUsersWithPaginationReq struct {
