@@ -64,7 +64,7 @@ func NewRest(o *Option) *Handler {
 	}
 
 	r := mux.NewRouter()
-	r.Use(middleware.CORSHandle)
+	// r.Use(middleware.CORSHandle)
 
 	URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
 
