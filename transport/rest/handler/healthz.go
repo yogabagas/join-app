@@ -7,7 +7,12 @@ import (
 )
 
 func (h *HandlerImpl) Healthcheck(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+
+	if r.Method != http.MethodGet || r.Method != http.MethodOptions {
 		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 		return
 	}
