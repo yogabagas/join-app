@@ -56,13 +56,9 @@ func (h *HandlerImpl) CreateUsers(w http.ResponseWriter, r *http.Request) {
 // @Router /v1/login [POST]
 func (h *HandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "*")
-
 	res := response.NewJSONResponse()
 
-	if r.Method != http.MethodPost || r.Method != http.MethodOptions {
+	if r.Method != http.MethodPost {
 		res.SetError(response.ErrMethodNotAllowed).Send(w)
 		return
 	}
