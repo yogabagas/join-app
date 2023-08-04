@@ -7,7 +7,8 @@ import (
 )
 
 func (h *HandlerImpl) Healthcheck(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
+
+	if r.Method != http.MethodGet {
 		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 		return
 	}
