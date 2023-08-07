@@ -1,5 +1,5 @@
 name: join-apps-ci-cd
-run-name: Deploy to 'master' by @${{ github.actor }}
+run-name: Deploy to ${{ github.ref }} by @${{ github.actor }}
 
 on:
   push:
@@ -51,7 +51,7 @@ jobs:
             docker-compose -f docker-compose-cache-dev.yml up -d
             docker-compose -f docker-compose-app-dev.yml up -d
             docker image prune -f
-            docker cp config/config.prod.json join-app:/app/config/files/config.dev.json
+            docker cp config/config.dev.json join-app:/app/config/files/config.dev.json
 
       - name: Deploy to Production
         uses: appleboy/ssh-action@master
