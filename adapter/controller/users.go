@@ -12,7 +12,6 @@ type UsersControllerImpl struct {
 
 type UsersController interface {
 	CreateUsers(ctx context.Context, req service.CreateUsersReq) error
-	Login(ctx context.Context, req service.LoginReq) (service.LoginResp, error)
 	Logout(ctx context.Context, req service.LogoutReq) error
 	GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (service.GetUsersWithPaginationResp, error)
 }
@@ -23,10 +22,6 @@ func NewUsersController(userSvc usecase.UsersService) UsersController {
 
 func (uc *UsersControllerImpl) CreateUsers(ctx context.Context, req service.CreateUsersReq) error {
 	return uc.usersSvc.CreateUsers(ctx, req)
-}
-
-func (uc *UsersControllerImpl) Login(ctx context.Context, req service.LoginReq) (service.LoginResp, error) {
-	return uc.usersSvc.Login(ctx, req)
 }
 
 func (uc *UsersControllerImpl) Logout(ctx context.Context, req service.LogoutReq) error {

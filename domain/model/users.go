@@ -57,10 +57,12 @@ type CountUsersResp struct {
 }
 
 type GenerateAccessTokenReq struct {
+	KeyID      string
 	UserUID    string
 	RoleUID    string
-	LastActive int
+	LastActive int64
 	ExpiredAt  int
+	IsValid    bool
 }
 
 type GenerateAccessTokenResp struct {
@@ -68,6 +70,7 @@ type GenerateAccessTokenResp struct {
 }
 
 type GenerateRefreshTokenReq struct {
+	KeyID     string
 	UserUID   string
 	ExpiredAt int
 }
@@ -85,5 +88,6 @@ type ReadUserByEmailPasswordReq struct {
 type ReadUserByEmailPasswordResp struct {
 	UserUID    string
 	RoleUID    string
+	RoleName   string
 	LastActive time.Time
 }

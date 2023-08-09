@@ -44,7 +44,6 @@ type UsersServiceImpl struct {
 
 type UsersService interface {
 	CreateUsers(ctx context.Context, req service.CreateUsersReq) error
-	Login(ctx context.Context, req service.LoginReq) (service.LoginResp, error)
 	Logout(ctx context.Context, req service.LogoutReq) error
 	GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (service.GetUsersWithPaginationResp, error)
 }
@@ -114,48 +113,6 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 		return err
 	}
 	return nil
-}
-
-func (us *UsersServiceImpl) Login(ctx context.Context, req service.LoginReq) (resp service.LoginResp, err error) {
-
-	pwd, err := util.Hash(config.GlobalCfg.PasswordAlg, req.Password)
-	if err != nil {
-		return resp, err
-	}
-
-	log.Println(util.Base64(pwd))
-
-	user, err := us.usersRepo.ReadUserByEmailPassword(ctx, &model.ReadUserByEmailPasswordReq{
-		Email:    req.Email,
-		Password: util.Base64(pwd),
-		RoleID:   constant.Role(req.RoleID).Int(),
-	})
-	if err != nil {
-		return resp, err
-	}
-
-	accessToken, err := us.generateAndSignAccessToken(ctx, &model.GenerateAccessTokenReq{
-		UserUID:    user.UserUID,
-		RoleUID:    user.RoleUID,
-		ExpiredAt:  config.GlobalCfg.TokenExpiration,
-		LastActive: int(user.LastActive.UTC().Unix()),
-	})
-	if err != nil {
-		return resp, err
-	}
-
-	refreshToken, err := us.generateAndSignRefreshToken(ctx, &model.GenerateRefreshTokenReq{
-		UserUID:   user.UserUID,
-		ExpiredAt: (config.GlobalCfg.TokenExpiration + config.GlobalCfg.RefreshTokenExpiration),
-	})
-	if err != nil {
-		return resp, err
-	}
-
-	return service.LoginResp{
-		AccessToken:  accessToken.Token,
-		RefreshToken: refreshToken.Token,
-	}, nil
 }
 
 func (us *UsersServiceImpl) Logout(ctx context.Context, req service.LogoutReq) error {

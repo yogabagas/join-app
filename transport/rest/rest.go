@@ -7,13 +7,14 @@ import (
 	"github/yogabagas/join-app/registry"
 	groupV1 "github/yogabagas/join-app/transport/rest/group/v1"
 	"github/yogabagas/join-app/transport/rest/handler"
-	"github/yogabagas/join-app/transport/rest/middlewares"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/rs/cors"
 
 	_ "github/yogabagas/join-app/docs"
 
@@ -57,7 +58,7 @@ func NewRest(o *Option) *Handler {
 	)
 
 	appController := reg.NewAppController()
-	middleware := middlewares.NewMiddleware()
+	// middleware := middlewares.NewMiddleware()
 
 	handlerImpl := handler.HandlerImpl{
 		Controller: appController,
@@ -84,7 +85,7 @@ func NewRest(o *Option) *Handler {
 	r.PathPrefix("/health").HandlerFunc(handlerImpl.Healthcheck)
 
 	v1 := r.PathPrefix("/v1").Subrouter()
-	v1.Use(middleware.AuthenticationMiddleware)
+	// v1.Use(middleware.AuthenticationMiddleware)
 
 	groupV1.NewAuthzV1(handlerImpl, v1)
 	groupV1.NewUsersV1(handlerImpl, v1)

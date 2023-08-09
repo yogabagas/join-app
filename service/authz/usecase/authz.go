@@ -7,16 +7,21 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github/yogabagas/join-app/config"
 	"github/yogabagas/join-app/domain/model"
 	"github/yogabagas/join-app/domain/repository/cache"
 	"github/yogabagas/join-app/domain/repository/sql"
 	"github/yogabagas/join-app/domain/service"
+	"github/yogabagas/join-app/service/authz/presenter"
 	authzRepo "github/yogabagas/join-app/service/authz/repository"
 	jwkRepo "github/yogabagas/join-app/service/jwk/repository"
 	usersRepo "github/yogabagas/join-app/service/users/repository"
 	"github/yogabagas/join-app/shared/constant"
 	"github/yogabagas/join-app/shared/util"
+	"log"
+	"strings"
 	"time"
 
 	"github.com/go-jose/go-jose/v3"
@@ -32,18 +37,21 @@ type AuthzServiceImpl struct {
 	jwkRepo   jwkRepo.JWKRepository
 	usersRepo usersRepo.UsersRepository
 	cache     cache.Cache
+	presenter presenter.AuthzPresenter
 }
 
 type AuthzService interface {
 	Login(ctx context.Context, req service.LoginReq) (resp service.LoginResp, err error)
+	VerifyJWT(ctx context.Context, req service.VerifyTokenReq) (resp service.VerifyTokenResp, err error)
 }
 
-func NewAuthzService(repository sql.RepositoryRegistry, cache cache.Cache) AuthzService {
+func NewAuthzService(repository sql.RepositoryRegistry, cache cache.Cache, presenter presenter.AuthzPresenter) AuthzService {
 	return &AuthzServiceImpl{
 		authzRepo: repository.AuthzRepository(),
 		jwkRepo:   repository.JWKRepository(),
 		usersRepo: repository.UserRepository(),
 		cache:     cache,
+		presenter: presenter,
 	}
 }
 
@@ -63,24 +71,27 @@ func (as *AuthzServiceImpl) Login(ctx context.Context, req service.LoginReq) (re
 		return resp, err
 	}
 
-	key, err := as.jwkRepo.ReadUnexpiredKey(ctx, &model.ReadUnexpiredKeyReq{
-		Time: time.Now().UTC(),
+	key, err := as.jwkRepo.ReadUnexpiredKeyByID(ctx, &model.ReadUnexpiredKeyByIDReq{
+		KeyID: user.RoleName,
 	})
 	if err != nil {
 		return resp, err
 	}
 
 	accessToken, err := as.generateAndSignAccessToken(ctx, &model.GenerateAccessTokenReq{
+		KeyID:      user.RoleName,
 		UserUID:    user.UserUID,
 		RoleUID:    user.RoleUID,
+		IsValid:    key == nil,
+		LastActive: user.LastActive.UTC().Unix(),
 		ExpiredAt:  config.GlobalCfg.TokenExpiration,
-		LastActive: int(user.LastActive.UTC().Unix()),
 	})
 	if err != nil {
 		return resp, err
 	}
 
 	refreshToken, err := as.generateAndSignRefreshToken(ctx, &model.GenerateRefreshTokenReq{
+		KeyID:     user.RoleName,
 		UserUID:   user.UserUID,
 		ExpiredAt: (config.GlobalCfg.TokenExpiration + config.GlobalCfg.RefreshTokenExpiration),
 	})
@@ -94,15 +105,82 @@ func (as *AuthzServiceImpl) Login(ctx context.Context, req service.LoginReq) (re
 	}, nil
 }
 
+func (as *AuthzServiceImpl) VerifyJWT(ctx context.Context, req service.VerifyTokenReq) (resp service.VerifyTokenResp, err error) {
+
+	token := strings.Split(req.Token, ".")
+
+	b, err := base64.RawStdEncoding.DecodeString(token[0])
+	if err != nil {
+		return resp, err
+	}
+
+	headerToken := make(map[string]string)
+	if err := json.Unmarshal(b, &headerToken); err != nil {
+		return resp, err
+	}
+
+	kid, ok := headerToken["kid"]
+	if !ok {
+		return resp, fmt.Errorf("token key ID is missing %s", kid)
+	}
+
+	object, err := jose.ParseSigned(req.Token)
+	if err != nil {
+		return resp, err
+	}
+
+	keys, err := as.jwkRepo.ReadUnexpiredKeys(ctx)
+	if err != nil {
+		return
+	}
+
+	if len(keys) <= 0 {
+		return resp, errors.New("key has expired")
+	}
+
+	var key interface{}
+	for _, k := range keys {
+
+		m := jose.JSONWebKey{}
+
+		if err = json.Unmarshal(k.Key.([]byte), &m); err != nil {
+			return
+		}
+
+		if m.KeyID == kid {
+			key = m
+		}
+
+	}
+
+	if key == nil {
+		return resp, errors.New("key not found")
+	}
+
+	pb, err := object.Verify(key)
+	if err != nil {
+		log.Println("error verify object", err)
+		return resp, err
+	}
+
+	payload := make(map[string]interface{})
+	if err = json.Unmarshal(pb, &payload); err != nil {
+		return resp, err
+	}
+
+	return as.presenter.VerifyJWT(ctx, payload)
+
+}
+
 func (as *AuthzServiceImpl) generateAndSignAccessToken(ctx context.Context, req *model.GenerateAccessTokenReq) (resp *model.GenerateAccessTokenResp, err error) {
 
-	signer, ok := keyMap[config.GlobalCfg.JWK.KeyID]
-	if !ok {
-		err := as.generateJWKKey(ctx)
+	signer, ok := keyMap[req.KeyID]
+	if !ok || !req.IsValid {
+		err := as.generateJWKKey(ctx, req.KeyID)
 		if err != nil {
 			return nil, err
 		}
-		signer = keyMap[config.GlobalCfg.JWK.KeyID]
+		signer = keyMap[req.KeyID]
 	}
 
 	claims := make(jwt.MapClaims)
@@ -134,14 +212,7 @@ func (as *AuthzServiceImpl) generateAndSignAccessToken(ctx context.Context, req 
 
 func (as *AuthzServiceImpl) generateAndSignRefreshToken(ctx context.Context, req *model.GenerateRefreshTokenReq) (resp *model.GenerateRefreshTokenResp, err error) {
 
-	signer, ok := keyMap[config.GlobalCfg.JWK.KeyID]
-	if !ok {
-		err := as.generateJWKKey(ctx)
-		if err != nil {
-			return nil, err
-		}
-		signer = keyMap[config.GlobalCfg.JWK.KeyID]
-	}
+	signer := keyMap[req.KeyID]
 
 	claims := make(jwt.MapClaims)
 	claims["sub"] = req.UserUID
@@ -168,14 +239,14 @@ func (as *AuthzServiceImpl) generateAndSignRefreshToken(ctx context.Context, req
 	}, nil
 }
 
-func (as *AuthzServiceImpl) generateJWKKey(ctx context.Context) error {
+func (as *AuthzServiceImpl) generateJWKKey(ctx context.Context, keyID string) error {
 
 	key, err := rsa.GenerateKey(rand.Reader, config.GlobalCfg.JWK.Size)
 	if err != nil {
 		return err
 	}
 
-	privateKeyID := config.GlobalCfg.JWK.KeyID
+	privateKeyID := keyID
 
 	privateKey := &jose.JSONWebKey{
 		Key:       key,
@@ -204,15 +275,16 @@ func (as *AuthzServiceImpl) generateJWKKey(ctx context.Context) error {
 		return err
 	}
 
-	expired := time.Now().Add(time.Duration(config.GlobalCfg.JWK.Expired) * time.Second).UTC()
+	expired := time.Now().Add(time.Duration(config.GlobalCfg.JWK.Expired) * time.Hour).UTC()
 
 	reqJWT := &model.JWK{
-		ID:        privateKeyID,
-		Key:       string(b),
-		ExpiredAt: expired,
+		ID:         privateKeyID,
+		Key:        string(b),
+		PrivateKey: privateKey,
+		ExpiredAt:  expired,
 	}
 
-	err = as.jwkRepo.CreateJWK(ctx, reqJWT)
+	err = as.jwkRepo.UpsertJWK(ctx, reqJWT)
 	if err != nil {
 		return err
 	}
@@ -223,7 +295,7 @@ func (as *AuthzServiceImpl) generateJWKKey(ctx context.Context) error {
 	}
 
 	keyMap = make(map[string]jose.Signer)
-	keyMap[config.GlobalCfg.JWK.KeyID] = signer
+	keyMap[keyID] = signer
 
 	return nil
 }

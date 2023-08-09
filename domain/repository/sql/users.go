@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"fmt"
 	"github/yogabagas/join-app/domain/model"
@@ -13,7 +14,7 @@ import (
 const (
 	insertUsers = `INSERT INTO users (uid, first_name, last_name, email, birthdate, username, password, created_by, updated_by) 
 	VALUES (?,?,?,?,?,?,?,?,?)`
-	selectUsersByEmailPassword = `SELECT u.uid, a.role_uid, a.last_active FROM users u JOIN authz a ON u.uid = a.user_uid 
+	selectUsersByEmailPassword = `SELECT u.uid, a.role_uid, r.name as role_name, a.last_active FROM users u JOIN authz a ON u.uid = a.user_uid 
 	JOIN roles r ON a.role_uid = r.uid WHERE u.email = ? AND u.password = ? AND r.id = ?`
 	selectUsersWithPagination = `SELECT u.uid, u.first_name, u.last_name, u.email, u.birthdate, u.username, u.created_at, 
 	(SELECT COUNT(*) from users us WHERE us.id = u.id) as per_page, r.name as role_name FROM users u JOIN authz a ON u.uid = a.user_uid 
@@ -44,12 +45,15 @@ func (ur *UsersRepositoryImpl) ReadUserByEmailPassword(ctx context.Context, req 
 	resp = &model.ReadUserByEmailPasswordResp{}
 
 	err = ur.db.QueryRowContext(ctx, selectUsersByEmailPassword, req.Email, req.Password, req.RoleID).
-		Scan(&resp.UserUID, &resp.RoleUID, &resp.LastActive)
-	if err != nil && err != sql.ErrNoRows {
+		Scan(&resp.UserUID, &resp.RoleUID, &resp.RoleName, &resp.LastActive)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("user not found, please check the credential")
+		}
 		return nil, err
 	}
 
-	return
+	return resp, nil
 }
 
 func (ur *UsersRepositoryImpl) ReadUsersWithPagination(ctx context.Context, req *model.ReadUsersWithPaginationReq) (resp *model.ReadUsersWithPaginationResp, err error) {

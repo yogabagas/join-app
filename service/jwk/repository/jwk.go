@@ -6,6 +6,7 @@ import (
 )
 
 type JWKRepository interface {
-	CreateJWK(context.Context, *model.JWK) error
-	ReadUnexpiredKey(context.Context, *model.ReadUnexpiredKeyReq) ([]*model.ReadUnexpiredKeyResp, error)
+	UpsertJWK(context.Context, *model.JWK) error
+	ReadUnexpiredKeyByID(context.Context, *model.ReadUnexpiredKeyByIDReq) (*model.ReadUnexpiredKeyByIDResp, error)
+	ReadUnexpiredKeys(context.Context) ([]*model.ReadUnexpiredKeyResp, error)
 }
