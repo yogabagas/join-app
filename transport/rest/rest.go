@@ -30,7 +30,8 @@ type Option struct {
 	WriteTimeout time.Duration
 	Sql          *sql.DB
 	Cache        cache.Cache
-	Mux          *mux.Router
+	// Mux          *mux.Router
+	Cors http.Handler
 }
 
 type Handler struct {
@@ -71,7 +72,8 @@ func NewRest(o *Option) *Handler {
 	})
 
 	r := mux.NewRouter()
-	r.Use(c.Handler)
+
+	withCORS := c.Handler(r)
 	// r.Use(middleware.CORSHandle)
 
 	URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
@@ -91,7 +93,8 @@ func NewRest(o *Option) *Handler {
 	groupV1.NewRolesV1(handlerImpl, v1)
 	groupV1.NewResourcesV1(handlerImpl, v1)
 
-	o.Mux = r
+	// o.Mux = r
+	o.Cors = withCORS
 
 	return &Handler{
 		option: o,
@@ -104,7 +107,7 @@ func (h *Handler) Serve() {
 	log.Printf("HTTP serve at : %s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
 
 	srv := &http.Server{
-		Handler:      h.option.Mux,
+		Handler:      h.option.Cors,
 		Addr:         config.GlobalCfg.App.Port,
 		ReadTimeout:  h.option.ReadTimeout,
 		WriteTimeout: h.option.WriteTimeout,
