@@ -44,7 +44,6 @@ type UsersServiceImpl struct {
 
 type UsersService interface {
 	CreateUsers(ctx context.Context, req service.CreateUsersReq) error
-	Logout(ctx context.Context, req service.LogoutReq) error
 	GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (service.GetUsersWithPaginationResp, error)
 }
 
@@ -113,13 +112,6 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 		return err
 	}
 	return nil
-}
-
-func (us *UsersServiceImpl) Logout(ctx context.Context, req service.LogoutReq) error {
-
-	key := fmt.Sprintf("auth::user-uid:%s", req.UserUID)
-
-	return us.cache.Delete(ctx, key)
 }
 
 func (us *UsersServiceImpl) generateAndSignAccessToken(ctx context.Context, req *model.GenerateAccessTokenReq) (resp *model.GenerateAccessTokenResp, err error) {

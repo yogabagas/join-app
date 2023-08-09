@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"github/yogabagas/join-app/domain/service"
-	"github/yogabagas/join-app/shared/util"
 	"github/yogabagas/join-app/transport/rest/handler/response"
 	"net/http"
 	"strconv"
@@ -42,46 +41,6 @@ func (h *HandlerImpl) CreateUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res.APIStatusCreated().Send(w)
-}
-
-// Logout handler
-// @Summary Lgout
-// @Description Logout endpoint
-// @Tags Users
-// @Produce json
-//
-// @Success 200 {object} response.JSONResponse().APIStatusSuccess()
-// @Failure 400 {object} response.JSONResponse
-// @Failure 500 {object} response.JSONResponse
-// @Router /v1/logout [POST]
-func (h *HandlerImpl) Logout(w http.ResponseWriter, r *http.Request) {
-	res := response.NewJSONResponse()
-
-	if r.Method != http.MethodDelete {
-		res.SetError(response.ErrMethodNotAllowed).Send(w)
-		return
-	}
-
-	token := r.Header.Get("Authorization")
-
-	claims, err := util.GetUserData(token)
-	if err != nil {
-		res.SetError(response.ErrUnauthorized).SetMessage(err.Error()).Send(w)
-		return
-	}
-
-	req := service.LogoutReq{
-		UserUID: claims.UserUID,
-	}
-
-	err = h.Controller.UsersController.Logout(r.Context(), req)
-
-	if err != nil {
-		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
-		return
-	}
-
-	res.APIStatusNoContent().Send(w)
 }
 
 // GetUsersWithPagination handler

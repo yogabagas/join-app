@@ -52,7 +52,7 @@ func SplitBearer(token string) (string, error) {
 		bearer = "Bearer "
 	}
 
-	token = strings.ReplaceAll(token, bearer, "")
+	token = strings.TrimPrefix(token, bearer)
 
 	if token == "" {
 		return "", errors.New("token is empty")

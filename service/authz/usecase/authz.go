@@ -42,6 +42,7 @@ type AuthzServiceImpl struct {
 
 type AuthzService interface {
 	Login(ctx context.Context, req service.LoginReq) (resp service.LoginResp, err error)
+	Logout(ctx context.Context, req service.LogoutReq) error
 	VerifyJWT(ctx context.Context, req service.VerifyTokenReq) (resp service.VerifyTokenResp, err error)
 }
 
@@ -113,11 +114,21 @@ func (as *AuthzServiceImpl) Login(ctx context.Context, req service.LoginReq) (re
 	}, nil
 }
 
+func (as *AuthzServiceImpl) Logout(ctx context.Context, req service.LogoutReq) error {
+
+	key := fmt.Sprintf("auth::user-uid:%s", req.UserUID)
+
+	return as.cache.Delete(ctx, key)
+}
+
 func (as *AuthzServiceImpl) VerifyJWT(ctx context.Context, req service.VerifyTokenReq) (resp service.VerifyTokenResp, err error) {
 
-	token := strings.Split(req.Token, ".")
+	token, err := util.SplitBearer(req.Token)
+	if err != nil {
+		return resp, err
+	}
 
-	b, err := base64.RawStdEncoding.DecodeString(token[0])
+	b, err := base64.RawStdEncoding.DecodeString(strings.Split(token, ".")[0])
 	if err != nil {
 		return resp, err
 	}
@@ -132,7 +143,7 @@ func (as *AuthzServiceImpl) VerifyJWT(ctx context.Context, req service.VerifyTok
 		return resp, fmt.Errorf("token key ID is missing %s", kid)
 	}
 
-	object, err := jose.ParseSigned(req.Token)
+	object, err := jose.ParseSigned(token)
 	if err != nil {
 		return resp, err
 	}
