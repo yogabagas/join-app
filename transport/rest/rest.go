@@ -18,7 +18,6 @@ import (
 
 	_ "github/yogabagas/join-app/docs"
 
-	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	"github.com/gorilla/mux"
@@ -64,14 +63,14 @@ func NewRest(o *Option) *Handler {
 		Controller: appController,
 	}
 
-	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"*"},
-		AllowedHeaders: []string{"*"},
-	})
+	// c := cors.New(cors.Options{
+	// 	AllowedOrigins: []string{"*"},
+	// 	AllowedMethods: []string{"*"},
+	// 	AllowedHeaders: []string{"*"},
+	// })
 
 	r := mux.NewRouter()
-	r.Use(c.Handler)
+	// r.Use(c.Handler)
 	// r.Use(middleware.CORSHandle)
 
 	URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
