@@ -99,6 +99,14 @@ func (as *AuthzServiceImpl) Login(ctx context.Context, req service.LoginReq) (re
 		return resp, err
 	}
 
+	cacheKeyLogin := fmt.Sprintf("auth::user-uid:%s", user.UserUID)
+	tokenExp := time.Now().UTC().Add(time.Duration(config.GlobalCfg.TokenExpiration) * time.Second).Unix()
+
+	err = as.cache.Set(ctx, cacheKeyLogin, true, int(tokenExp))
+	if err != nil {
+		log.Fatalln("error set cache auth", err)
+	}
+
 	return service.LoginResp{
 		AccessToken:  accessToken.Token,
 		RefreshToken: refreshToken.Token,
