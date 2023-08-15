@@ -67,10 +67,10 @@ func NewRest(o *Option) *Handler {
 
 	// r.Use(middleware.CORSHandle)
 
-	URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
+	// URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
 
 	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("%s/swagger/doc.json", URI)),
+		httpSwagger.URL(fmt.Sprintf("%s/swagger/doc.json", config.GlobalCfg.App.Host)),
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("none"),
 		httpSwagger.DomID("swagger-ui"),
