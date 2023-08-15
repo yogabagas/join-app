@@ -18,7 +18,6 @@ import (
 
 	_ "github/yogabagas/join-app/docs"
 
-	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 
 	"github.com/gorilla/mux"
@@ -30,8 +29,7 @@ type Option struct {
 	WriteTimeout time.Duration
 	Sql          *sql.DB
 	Cache        cache.Cache
-	// Mux          *mux.Router
-	Cors http.Handler
+	Mux          *mux.Router
 }
 
 type Handler struct {
@@ -65,15 +63,8 @@ func NewRest(o *Option) *Handler {
 		Controller: appController,
 	}
 
-	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"*"},
-		AllowedHeaders: []string{"*"},
-	})
-
 	r := mux.NewRouter()
 
-	withCORS := c.Handler(r)
 	// r.Use(middleware.CORSHandle)
 
 	URI := fmt.Sprintf("%s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
@@ -93,8 +84,7 @@ func NewRest(o *Option) *Handler {
 	groupV1.NewRolesV1(handlerImpl, v1)
 	groupV1.NewResourcesV1(handlerImpl, v1)
 
-	// o.Mux = r
-	o.Cors = withCORS
+	o.Mux = r
 
 	return &Handler{
 		option: o,
@@ -107,7 +97,7 @@ func (h *Handler) Serve() {
 	log.Printf("HTTP serve at : %s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
 
 	srv := &http.Server{
-		Handler:      h.option.Cors,
+		Handler:      h.option.Mux,
 		Addr:         config.GlobalCfg.App.Port,
 		ReadTimeout:  h.option.ReadTimeout,
 		WriteTimeout: h.option.WriteTimeout,
