@@ -74,7 +74,7 @@ func (mi *MiddlewareImpl) parseJwt(authorizationHeader string, r *http.Request) 
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("There was an error")
 			}
-			return []byte(config.GlobalCfg.App.JwtSecret), nil
+			return []byte(config.GlobalCfg.App.JWTSecret), nil
 		})
 
 		ctx = context.WithValue(r.Context(), "user_data", token)

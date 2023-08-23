@@ -10,6 +10,8 @@ type (
 	IsDeleted int
 
 	ResourcesType int
+
+	KeyID string
 )
 
 var (
@@ -28,6 +30,8 @@ var (
 
 	Menu ResourcesType = 1
 	API  ResourcesType = 2
+
+	Default KeyID = "default"
 )
 
 func (pa PassAlgorithm) String() string {
@@ -56,4 +60,8 @@ func (r Role) String() string {
 
 func (i IsDeleted) Int() int {
 	return int(i)
+}
+
+func (k KeyID) String() string {
+	return string(k)
 }

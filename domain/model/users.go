@@ -2,6 +2,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/go-jose/go-jose/v3"
 )
 
 type User struct {
@@ -54,4 +56,41 @@ type CountUsersReq struct {
 
 type CountUsersResp struct {
 	Total int
+}
+
+type GenerateAccessTokenReq struct {
+	KeyID      string
+	UserUID    string
+	RoleUID    string
+	LastActive int64
+	ExpiredAt  int
+	Signer     jose.Signer
+}
+
+type GenerateAccessTokenResp struct {
+	Token string
+}
+
+type GenerateRefreshTokenReq struct {
+	KeyID     string
+	UserUID   string
+	ExpiredAt int
+	Signer    jose.Signer
+}
+
+type GenerateRefreshTokenResp struct {
+	Token string
+}
+
+type ReadUserByEmailPasswordReq struct {
+	Email    string
+	Password string
+	RoleID   int
+}
+
+type ReadUserByEmailPasswordResp struct {
+	UserUID    string
+	RoleUID    string
+	RoleName   string
+	LastActive time.Time
 }
