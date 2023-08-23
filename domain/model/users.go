@@ -2,6 +2,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/go-jose/go-jose/v3"
 )
 
 type User struct {
@@ -62,7 +64,7 @@ type GenerateAccessTokenReq struct {
 	RoleUID    string
 	LastActive int64
 	ExpiredAt  int
-	IsValid    bool
+	Signer     jose.Signer
 }
 
 type GenerateAccessTokenResp struct {
@@ -73,6 +75,7 @@ type GenerateRefreshTokenReq struct {
 	KeyID     string
 	UserUID   string
 	ExpiredAt int
+	Signer    jose.Signer
 }
 
 type GenerateRefreshTokenResp struct {

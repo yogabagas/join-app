@@ -79,13 +79,35 @@ func (as *AuthzServiceImpl) Login(ctx context.Context, req service.LoginReq) (re
 		return resp, err
 	}
 
+	obj := &jose.JSONWebKey{}
+
+	privateKeyCache := fmt.Sprintf("jwk::private-key:%s", user.RoleName)
+
+	_ = as.cache.GetObject(ctx, privateKeyCache, &obj)
+
+	if key.ID != obj.KeyID || (key.ID == "" || obj.KeyID == "") {
+		if err = as.generateJWKKey(ctx, user.RoleName); err != nil {
+			return resp, err
+		}
+
+		err = as.cache.GetObject(ctx, privateKeyCache, &obj)
+		if err != nil {
+			return resp, err
+		}
+	}
+
+	signer, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.SignatureAlgorithm(obj.Algorithm), Key: obj}, nil)
+	if err != nil {
+		return resp, err
+	}
+
 	accessToken, err := as.generateAndSignAccessToken(ctx, &model.GenerateAccessTokenReq{
 		KeyID:      user.RoleName,
 		UserUID:    user.UserUID,
 		RoleUID:    user.RoleUID,
-		IsValid:    key == nil,
 		LastActive: user.LastActive.UTC().Unix(),
 		ExpiredAt:  config.GlobalCfg.TokenExpiration,
+		Signer:     signer,
 	})
 	if err != nil {
 		return resp, err
@@ -95,6 +117,7 @@ func (as *AuthzServiceImpl) Login(ctx context.Context, req service.LoginReq) (re
 		KeyID:     user.RoleName,
 		UserUID:   user.UserUID,
 		ExpiredAt: (config.GlobalCfg.TokenExpiration + config.GlobalCfg.RefreshTokenExpiration),
+		Signer:    signer,
 	})
 	if err != nil {
 		return resp, err
@@ -193,15 +216,6 @@ func (as *AuthzServiceImpl) VerifyJWT(ctx context.Context, req service.VerifyTok
 
 func (as *AuthzServiceImpl) generateAndSignAccessToken(ctx context.Context, req *model.GenerateAccessTokenReq) (resp *model.GenerateAccessTokenResp, err error) {
 
-	signer, ok := keyMap[req.KeyID]
-	if !ok || !req.IsValid {
-		err := as.generateJWKKey(ctx, req.KeyID)
-		if err != nil {
-			return nil, err
-		}
-		signer = keyMap[req.KeyID]
-	}
-
 	claims := make(jwt.MapClaims)
 	claims["sub"] = req.UserUID
 	claims["role_uid"] = req.RoleUID
@@ -214,7 +228,7 @@ func (as *AuthzServiceImpl) generateAndSignAccessToken(ctx context.Context, req 
 		return nil, err
 	}
 
-	obj, err := signer.Sign(data)
+	obj, err := req.Signer.Sign(data)
 	if err != nil {
 		return nil, err
 	}
@@ -231,8 +245,6 @@ func (as *AuthzServiceImpl) generateAndSignAccessToken(ctx context.Context, req 
 
 func (as *AuthzServiceImpl) generateAndSignRefreshToken(ctx context.Context, req *model.GenerateRefreshTokenReq) (resp *model.GenerateRefreshTokenResp, err error) {
 
-	signer := keyMap[req.KeyID]
-
 	claims := make(jwt.MapClaims)
 	claims["sub"] = req.UserUID
 	claims["iat"] = time.Now().UTC().Unix()
@@ -243,7 +255,7 @@ func (as *AuthzServiceImpl) generateAndSignRefreshToken(ctx context.Context, req
 		return nil, err
 	}
 
-	obj, err := signer.Sign(data)
+	obj, err := req.Signer.Sign(data)
 	if err != nil {
 		return nil, err
 	}
@@ -308,13 +320,12 @@ func (as *AuthzServiceImpl) generateJWKKey(ctx context.Context, keyID string) er
 		return err
 	}
 
-	signer, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.SignatureAlgorithm(privateKey.Algorithm), Key: privateKey}, nil)
+	privKeyCache := fmt.Sprintf("jwk::private-key:%s", privateKeyID)
+
+	err = as.cache.Set(ctx, privKeyCache, privateKey, int(expired.Unix()))
 	if err != nil {
 		return err
 	}
-
-	keyMap = make(map[string]jose.Signer)
-	keyMap[keyID] = signer
 
 	return nil
 }

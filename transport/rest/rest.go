@@ -14,8 +14,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/rs/cors"
-
 	_ "github/yogabagas/join-app/docs"
 
 	"github.com/go-redis/redis/v8"
