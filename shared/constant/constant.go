@@ -65,3 +65,7 @@ func (i IsDeleted) Int() int {
 func (k KeyID) String() string {
 	return string(k)
 }
+
+func (rt ResourcesType) Int() int {
+	return int(rt)
+}
