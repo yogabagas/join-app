@@ -4,14 +4,13 @@ import "time"
 
 type JWTClaims struct {
 	RoleUID string `json:"role_uid"`
-	UserUID string `json:"user_uid"`
+	UserUID string `json:"sub"`
 	Token   string `json:"token"`
 }
 
 type LoginReq struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
-	RoleID   int    `json:"role_id" validate:"required"`
 }
 
 type LoginResp struct {

@@ -79,6 +79,7 @@ func NewRest(o *Option) *Handler {
 	v1 := r.PathPrefix("/v1").Subrouter()
 	// v1.Use(middleware.AuthenticationMiddleware)
 
+	groupV1.NewAccessV1(handlerImpl, v1)
 	groupV1.NewAuthzV1(handlerImpl, v1)
 	groupV1.NewUsersV1(handlerImpl, v1)
 	groupV1.NewRolesV1(handlerImpl, v1)

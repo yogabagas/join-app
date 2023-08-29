@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	accessRepo "github/yogabagas/join-app/service/access/repository"
 	authzRepo "github/yogabagas/join-app/service/authz/repository"
 	jwkRepo "github/yogabagas/join-app/service/jwk/repository"
 	resourcesRepo "github/yogabagas/join-app/service/resources/repository"
@@ -14,10 +15,12 @@ type InTransaction func(RepositoryRegistry) (interface{}, error)
 
 type RepositoryRegistryImpl struct {
 	db         *sql.DB
+	tx         *sql.Tx
 	dbExecutor DBExecutor
 }
 
 type RepositoryRegistry interface {
+	AccessRepository() accessRepo.AccessRepository
 	AuthzRepository() authzRepo.AuthzRepository
 	JWKRepository() jwkRepo.JWKRepository
 	RolesRepository() rolesRepo.RolesRepository
@@ -29,6 +32,13 @@ type RepositoryRegistry interface {
 
 func NewRepositoryRegistry(db *sql.DB) RepositoryRegistry {
 	return &RepositoryRegistryImpl{db: db}
+}
+
+func (r RepositoryRegistryImpl) AccessRepository() accessRepo.AccessRepository {
+	if r.dbExecutor != nil {
+		return NewAccessRepository(r.dbExecutor)
+	}
+	return NewAccessRepository(r.db)
 }
 
 func (r RepositoryRegistryImpl) AuthzRepository() authzRepo.AuthzRepository {
