@@ -6,19 +6,18 @@ import (
 	"github/yogabagas/join-app/domain/service"
 )
 
-type ResourcesPresenterImpl struct{}
+type AccessPresenterImpl struct{}
 
-type ResourcesPresenter interface {
-	GetResourcesByType(ctx context.Context, req []*model.ReadResourcesByTypeResp) ([]service.GetResourcesByTypeResp, error)
+type AccessPresenter interface {
+	GetAccessByRoleUID(ctx context.Context, req []*model.ReadAccessByRoleUIDResp) ([]service.GetAccessByRoleUIDResp, error)
 }
 
-func NewResourcesPresenter() ResourcesPresenter {
-	return &ResourcesPresenterImpl{}
+func NewAccessPresenter() AccessPresenter {
+	return &AccessPresenterImpl{}
 }
 
-func (rp *ResourcesPresenterImpl) GetResourcesByType(ctx context.Context, req []*model.ReadResourcesByTypeResp) (resp []service.GetResourcesByTypeResp, err error) {
-
-	menuMap := make(map[string]service.GetResourcesByTypeResp)
+func (ap *AccessPresenterImpl) GetAccessByRoleUID(ctx context.Context, req []*model.ReadAccessByRoleUIDResp) (resp []service.GetAccessByRoleUIDResp, err error) {
+	menuMap := make(map[string]service.GetAccessByRoleUIDResp)
 	indexMap := make(map[string]int)
 
 	if len(req) > 0 {
@@ -26,7 +25,7 @@ func (rp *ResourcesPresenterImpl) GetResourcesByType(ctx context.Context, req []
 
 			indexMap[v.UID] = i
 
-			res := service.GetResourcesByTypeResp{
+			res := service.GetAccessByRoleUIDResp{
 				UID:       v.UID,
 				Name:      v.Name,
 				Type:      v.Type,
@@ -43,7 +42,7 @@ func (rp *ResourcesPresenterImpl) GetResourcesByType(ctx context.Context, req []
 
 				if parent.UID != "" {
 					if parent.Child == nil {
-						parent.Child = []service.GetResourcesByTypeResp{}
+						parent.Child = []service.GetAccessByRoleUIDResp{}
 					}
 					parent.Child = append(parent.Child, res)
 				}

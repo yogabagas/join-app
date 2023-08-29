@@ -53,6 +53,7 @@ func (m *module) NewCacheRegistry() cache.Cache {
 
 func (m *module) NewAppController() controller.AppController {
 	return controller.AppController{
+		AccessController:    m.NewAccessController(),
 		AuthzController:     m.NewAuthzController(),
 		ResourcesController: m.NewResourcesController(),
 		RolesController:     m.NewRolesController(),

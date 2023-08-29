@@ -69,3 +69,25 @@ func (k KeyID) String() string {
 func (rt ResourcesType) Int() int {
 	return int(rt)
 }
+
+func (rt ResourcesType) String() string {
+	switch rt.Int() {
+	case Menu.Int():
+		return "menu"
+	case API.Int():
+		return "api"
+	default:
+		return " "
+	}
+}
+
+func ResourceTypeAtoi(s string) ResourcesType {
+	switch s {
+	case "menu":
+		return Menu
+	case "api":
+		return API
+	default:
+		return 0
+	}
+}

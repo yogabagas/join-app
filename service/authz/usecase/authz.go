@@ -18,7 +18,6 @@ import (
 	authzRepo "github/yogabagas/join-app/service/authz/repository"
 	jwkRepo "github/yogabagas/join-app/service/jwk/repository"
 	usersRepo "github/yogabagas/join-app/service/users/repository"
-	"github/yogabagas/join-app/shared/constant"
 	"github/yogabagas/join-app/shared/util"
 	"log"
 	"strings"
@@ -26,10 +25,6 @@ import (
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/golang-jwt/jwt"
-)
-
-var (
-	keyMap map[string]jose.Signer
 )
 
 type AuthzServiceImpl struct {
@@ -66,7 +61,6 @@ func (as *AuthzServiceImpl) Login(ctx context.Context, req service.LoginReq) (re
 	user, err := as.usersRepo.ReadUserByEmailPassword(ctx, &model.ReadUserByEmailPasswordReq{
 		Email:    req.Email,
 		Password: util.Base64(pwd),
-		RoleID:   constant.Role(req.RoleID).Int(),
 	})
 	if err != nil {
 		return resp, err

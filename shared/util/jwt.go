@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	"fmt"
 	"github/yogabagas/join-app/domain/service"
 	"regexp"
 	"strings"
@@ -12,21 +11,21 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-func GetUserData(token string) (resp *service.JWTClaims, err error) {
+func GetUserData(token string) (resp service.JWTClaims, err error) {
 
 	jwtToken, err := SplitBearer(token)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 
-	tokenParse, err := new(jwt.Parser).ParseWithClaims(jwtToken, jwt.MapClaims{}, nil)
+	tokenParse, _, err := new(jwt.Parser).ParseUnverified(jwtToken, jwt.MapClaims{})
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 
 	if claims, ok := tokenParse.Claims.(jwt.MapClaims); ok {
 		if subject, ok := claims["sub"]; ok {
-			resp.UserUID = fmt.Sprintf("%v", subject)
+			resp.UserUID = subject.(string)
 		}
 		if role, ok := claims["role_uid"]; ok {
 			resp.RoleUID = role.(string)
