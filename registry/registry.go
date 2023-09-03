@@ -54,5 +54,6 @@ func (m *module) NewAppController() controller.AppController {
 		UsersController:     m.NewUsersController(),
 		RolesController:     m.NewRolesController(),
 		ResourcesController: m.NewResourcesController(),
+		CoursesController:   m.NewCoursesController(),
 	}
 }

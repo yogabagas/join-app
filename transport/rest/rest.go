@@ -90,6 +90,7 @@ func NewRest(o *Option) *Handler {
 	groupV1.NewUsersV1(handlerImpl, v1)
 	groupV1.NewRolesV1(handlerImpl, v1)
 	groupV1.NewResourcesV1(handlerImpl, v1)
+	groupV1.NewCoursesV1(handlerImpl, v1)
 
 	o.Mux = r
 
