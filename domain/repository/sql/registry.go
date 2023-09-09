@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"github/yogabagas/join-app/pkg/cache"
 	authzRepo "github/yogabagas/join-app/service/authz/repository"
-	coursesRepo "github/yogabagas/join-app/service/courses/repository"
+	coursesRepo "github/yogabagas/join-app/service/modules/repository"
 	resourcesRepo "github/yogabagas/join-app/service/resources/repository"
 	rolesRepo "github/yogabagas/join-app/service/roles/repository"
 	usersRepo "github/yogabagas/join-app/service/users/repository"
@@ -24,7 +24,7 @@ type RepositoryRegistry interface {
 	RolesRepository() rolesRepo.RolesRepository
 	ResourcesRepository() resourcesRepo.ResourcesRepository
 	UserRepository() usersRepo.UsersRepository
-	CoursesRepository() coursesRepo.CoursesRepository
+	CoursesRepository() coursesRepo.ModulesRepository
 
 	DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error)
 }
@@ -61,11 +61,11 @@ func (r RepositoryRegistryImpl) UserRepository() usersRepo.UsersRepository {
 	return NewUsersRepository(r.db, r.cache)
 }
 
-func (r RepositoryRegistryImpl) CoursesRepository() coursesRepo.CoursesRepository {
+func (r RepositoryRegistryImpl) CoursesRepository() coursesRepo.ModulesRepository {
 	if r.dbExecutor != nil {
-		return NewCoursesRepository(r.dbExecutor)
+		return NewModulesRepository(r.dbExecutor)
 	}
-	return NewCoursesRepository(r.db)
+	return NewModulesRepository(r.db)
 }
 
 func (r RepositoryRegistryImpl) DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error) {

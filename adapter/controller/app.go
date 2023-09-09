@@ -4,5 +4,5 @@ type AppController struct {
 	UsersController     interface{ UsersController }
 	ResourcesController interface{ ResourcesController }
 	RolesController     interface{ RolesController }
-	CoursesController   interface{ CoursesController }
+	CoursesController   interface{ ModulesController }
 }
