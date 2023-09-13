@@ -1,3 +1,4 @@
 vendor
 .idea/
 config/files/config.local.json
+storage/*

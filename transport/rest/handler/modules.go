@@ -29,8 +29,9 @@ func (h *HandlerImpl) CreateModules(w http.ResponseWriter, r *http.Request) {
 
 	var req service.CreateModulesReq
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
+	req, err := req.SetCreateModuleReq(r)
+	if err != nil {
+		res.SetError(response.ErrBadRequest).Send(w)
 		return
 	}
 
