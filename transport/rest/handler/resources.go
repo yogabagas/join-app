@@ -16,6 +16,7 @@ import (
 // @Description New Resources Registration
 // @Tags Resources
 // @Produce json
+// @Security ApiKeyAuth
 // @Param users body service.CreateResourcesReq true "Request Create Resources"
 // @Success 200 {object} response.JSONResponse().APIStatusCreated()
 // @Failure 400 {object} response.JSONResponse

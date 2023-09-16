@@ -48,6 +48,7 @@ func (h *HandlerImpl) CreateUsers(w http.ResponseWriter, r *http.Request) {
 // @Description GetUsersWithPagination for get users detail with limit
 // @Tags Users
 // @Produce json
+// @Security ApiKeyAuth
 // @Param name query string false "user fullname e.g John Doe"
 // @Param limit query int false "limit data; default 10"
 // @Param page query int false "number of page; default 1"

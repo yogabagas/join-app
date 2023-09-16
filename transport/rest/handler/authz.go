@@ -50,7 +50,7 @@ func (h *HandlerImpl) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 // Logout handler
-// @Summary Lgout
+// @Summary Logout
 // @Description Logout endpoint
 // @Tags Users
 // @Produce json

@@ -27,6 +27,11 @@ const docTemplate = `{
     "paths": {
         "/v1/access": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "UpsertAccess for update and insert existing/new access",
                 "produces": [
                     "application/json"
@@ -186,7 +191,7 @@ const docTemplate = `{
                 "tags": [
                     "Users"
                 ],
-                "summary": "Lgout",
+                "summary": "Logout",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -211,6 +216,11 @@ const docTemplate = `{
         },
         "/v1/resources": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "New Resources Registration",
                 "produces": [
                     "application/json"
@@ -254,6 +264,11 @@ const docTemplate = `{
         },
         "/v1/roles": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Roles registration endpoint",
                 "produces": [
                     "application/json"
@@ -297,6 +312,11 @@ const docTemplate = `{
         },
         "/v1/users": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "GetUsersWithPagination for get users detail with limit",
                 "produces": [
                     "application/json"
