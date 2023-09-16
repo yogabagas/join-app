@@ -10,6 +10,7 @@ import (
 	"github/yogabagas/join-app/domain/service"
 	"github/yogabagas/join-app/service/users/presenter"
 	"github/yogabagas/join-app/shared/util"
+	"log"
 
 	"github/yogabagas/join-app/shared/constant"
 	"time"
@@ -78,6 +79,7 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 			UpdatedBy:   userUID,
 		})
 		if err != nil {
+			log.Println("error insert users", err)
 			return nil, err
 		}
 
@@ -87,6 +89,7 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 			Password: util.Base64(pwd),
 		})
 		if err != nil {
+			log.Println("error insert credentials", err)
 			return nil, err
 		}
 
@@ -95,6 +98,7 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 
 	_, err = us.repo.DoInTransaction(ctx, InTransaction)
 	if err != nil {
+		log.Println("error do in transaction", err)
 		return err
 	}
 
@@ -108,6 +112,7 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 		UpdatedBy: userUID,
 	})
 	if err != nil {
+		log.Println("error insert authz", err)
 		return err
 	}
 	return nil
