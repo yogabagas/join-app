@@ -30,6 +30,7 @@ var (
 
 	Mentor Role = 1
 	Mentee Role = 2
+	Admin  Role = 3
 
 	False IsDeleted = 0
 	True  IsDeleted = 1
