@@ -8,6 +8,7 @@ import (
 	jwkRepo "github/yogabagas/join-app/service/jwk/repository"
 	resourcesRepo "github/yogabagas/join-app/service/resources/repository"
 	rolesRepo "github/yogabagas/join-app/service/roles/repository"
+	userCredentialsRepo "github/yogabagas/join-app/service/userCredentials/repository"
 	usersRepo "github/yogabagas/join-app/service/users/repository"
 )
 
@@ -25,7 +26,8 @@ type RepositoryRegistry interface {
 	JWKRepository() jwkRepo.JWKRepository
 	RolesRepository() rolesRepo.RolesRepository
 	ResourcesRepository() resourcesRepo.ResourcesRepository
-	UserRepository() usersRepo.UsersRepository
+	UserCredentialsRepository() userCredentialsRepo.UserCredentialsRepository
+	UsersRepository() usersRepo.UsersRepository
 
 	DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error)
 }
@@ -69,7 +71,14 @@ func (r RepositoryRegistryImpl) ResourcesRepository() resourcesRepo.ResourcesRep
 	return NewResourcesRepository(r.db)
 }
 
-func (r RepositoryRegistryImpl) UserRepository() usersRepo.UsersRepository {
+func (r RepositoryRegistryImpl) UserCredentialsRepository() userCredentialsRepo.UserCredentialsRepository {
+	if r.dbExecutor != nil {
+		return NewUserCredentialsRepository(r.dbExecutor)
+	}
+	return NewUserCredentialsRepository(r.db)
+}
+
+func (r RepositoryRegistryImpl) UsersRepository() usersRepo.UsersRepository {
 	if r.dbExecutor != nil {
 		return NewUsersRepository(r.dbExecutor)
 	}

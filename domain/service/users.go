@@ -4,7 +4,11 @@ type CreateUsersReq struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Birthdate string `json:"birthdate"`
+	Gender    int    `json:"gender"`
+	Country   string `json:"country"`
 	Email     string `json:"email"`
+	Photo     string `json:"photo"`
+	Bio       string `json:"bio"`
 	RoleID    int    `json:"role_id"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`

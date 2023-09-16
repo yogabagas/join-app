@@ -34,6 +34,14 @@
             {
                 "endpoint": "/v1/login",
                 "methods": ["POST"]
+            },
+            {
+                "endpoint": "/swagger/*",
+                "methods": ["GET"]
+            }, 
+            {
+                "endpoint": "/v1/users",
+                "methods": ["POST"]
             }
         ]
     },

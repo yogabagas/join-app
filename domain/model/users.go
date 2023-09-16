@@ -7,19 +7,21 @@ import (
 )
 
 type User struct {
-	ID        int
-	UID       string
-	FirstName string
-	LastName  string
-	Email     string
-	Birthdate time.Time
-	Username  string
-	Password  string
-	IsDeleted bool
-	CreatedBy string
-	CreatedAt time.Time
-	UpdatedBy string
-	UpdatedAt time.Time
+	ID          int
+	UID         string
+	FirstName   string
+	LastName    string
+	Email       string
+	Birthdate   time.Time
+	Description string
+	Gender      int
+	Country     string
+	Photo       string
+	IsDeleted   bool
+	CreatedBy   string
+	CreatedAt   time.Time
+	UpdatedBy   string
+	UpdatedAt   time.Time
 }
 
 type ReadUsersWithPaginationReq struct {
@@ -82,13 +84,11 @@ type GenerateRefreshTokenResp struct {
 	Token string
 }
 
-type ReadUserByEmailPasswordReq struct {
-	Email    string
-	Password string
-	RoleID   int
+type ReadUserByEmailReq struct {
+	Email string
 }
 
-type ReadUserByEmailPasswordResp struct {
+type ReadUserByEmailResp struct {
 	UserUID    string
 	RoleUID    string
 	RoleName   string

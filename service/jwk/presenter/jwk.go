@@ -7,16 +7,17 @@ import (
 	"time"
 )
 
-type AuthzPresenterImpl struct{}
+type JWKPresenterImpl struct{}
 
-type AuthzPresenter interface {
+type JWKPresenter interface {
+	VerifyJWT(ctx context.Context, payload map[string]interface{}) (service.VerifyTokenResp, error)
 }
 
-func NewAuthzPresenter() AuthzPresenter {
-	return &AuthzPresenterImpl{}
+func NewJWKPresenter() JWKPresenter {
+	return &JWKPresenterImpl{}
 }
 
-func (ap *AuthzPresenterImpl) VerifyJWT(ctx context.Context, payload map[string]interface{}) (resp service.VerifyTokenResp, err error) {
+func (jp *JWKPresenterImpl) VerifyJWT(ctx context.Context, payload map[string]interface{}) (resp service.VerifyTokenResp, err error) {
 
 	sub, ok := payload["sub"].(string)
 	if !ok {

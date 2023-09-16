@@ -25,6 +25,190 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/access": {
+            "put": {
+                "description": "UpsertAccess for update and insert existing/new access",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access"
+                ],
+                "summary": "UpsertAccess",
+                "parameters": [
+                    {
+                        "description": "Request Upsert Access",
+                        "name": "access",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.UpsertAccessReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/access/{type}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "GetAccessByRoleUID for get access by role uid",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Access"
+                ],
+                "summary": "GetAccessByRoleUID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "resource type",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.JSONResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.GetAccessByRoleUIDResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/login": {
+            "post": {
+                "description": "Login endpoint",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Request Login",
+                        "name": "users",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.LoginReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/logout": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Logout endpoint",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Lgout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/resources": {
             "post": {
                 "description": "New Resources Registration",
@@ -81,7 +265,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Request Create Role",
-                        "name": "users",
+                        "name": "roles",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -274,7 +458,13 @@ const docTemplate = `{
         "service.CreateUsersReq": {
             "type": "object",
             "properties": {
+                "bio": {
+                    "type": "string"
+                },
                 "birthdate": {
+                    "type": "string"
+                },
+                "country": {
                     "type": "string"
                 },
                 "email": {
@@ -283,16 +473,51 @@ const docTemplate = `{
                 "first_name": {
                     "type": "string"
                 },
+                "gender": {
+                    "type": "integer"
+                },
                 "last_name": {
                     "type": "string"
                 },
                 "password": {
                     "type": "string"
                 },
+                "photo": {
+                    "type": "string"
+                },
                 "role_id": {
                     "type": "integer"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.GetAccessByRoleUIDResp": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "child": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.GetAccessByRoleUIDResp"
+                    }
+                },
+                "level": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "uid": {
                     "type": "string"
                 }
             }
@@ -311,6 +536,21 @@ const docTemplate = `{
                 }
             }
         },
+        "service.LoginReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "service.Pagination": {
             "type": "object",
             "properties": {
@@ -325,6 +565,32 @@ const docTemplate = `{
                 },
                 "total_page": {
                     "type": "integer"
+                }
+            }
+        },
+        "service.UpsertAccessReq": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "resources_uid": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "role_uid": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "updatedBy": {
+                    "type": "string"
                 }
             }
         },
@@ -347,6 +613,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

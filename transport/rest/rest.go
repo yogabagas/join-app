@@ -7,6 +7,7 @@ import (
 	"github/yogabagas/join-app/registry"
 	groupV1 "github/yogabagas/join-app/transport/rest/group/v1"
 	"github/yogabagas/join-app/transport/rest/handler"
+	"github/yogabagas/join-app/transport/rest/middlewares"
 	"log"
 	"net/http"
 	"os"
@@ -47,7 +48,9 @@ type Handler struct {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @BasePath /
-// @name Mentoring App
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func NewRest(o *Option) *Handler {
 
 	reg := registry.NewRegistry(
@@ -56,13 +59,14 @@ func NewRest(o *Option) *Handler {
 	)
 
 	appController := reg.NewAppController()
-	// middleware := middlewares.NewMiddleware()
+	middleware := middlewares.NewMiddleware(reg)
 
 	handlerImpl := handler.HandlerImpl{
 		Controller: appController,
 	}
 
 	r := mux.NewRouter()
+	r.Use(middleware.AuthenticationMiddleware)
 
 	// r.Use(middleware.CORSHandle)
 
@@ -77,6 +81,7 @@ func NewRest(o *Option) *Handler {
 	r.PathPrefix("/health").HandlerFunc(handlerImpl.Healthcheck)
 
 	v1 := r.PathPrefix("/v1").Subrouter()
+
 	// v1.Use(middleware.AuthenticationMiddleware)
 
 	groupV1.NewAccessV1(handlerImpl, v1)

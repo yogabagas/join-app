@@ -3,9 +3,10 @@ package service
 import "time"
 
 type JWTClaims struct {
-	RoleUID string `json:"role_uid"`
-	UserUID string `json:"sub"`
-	Token   string `json:"token"`
+	Sub        string    `json:"sub"`
+	RoleUID    string    `json:"role_uid"`
+	LastActive time.Time `json:"last_active"`
+	ExpiredAt  time.Time `json:"expired_at"`
 }
 
 type LoginReq struct {
@@ -28,4 +29,12 @@ type VerifyTokenResp struct {
 	RoleUID    string    `json:"role_uid"`
 	LastActive time.Time `json:"last_active"`
 	ExpiredAt  time.Time `json:"expired_at"`
+}
+
+type HasAuthenticatedReq struct {
+	Sub string `json:"sub"`
+}
+
+type HasAuthenticatedResp struct {
+	Valid bool `json:"valid"`
 }

@@ -13,7 +13,7 @@ type AuthzControllerImpl struct {
 type AuthzController interface {
 	Login(ctx context.Context, req service.LoginReq) (resp service.LoginResp, err error)
 	Logout(ctx context.Context, req service.LogoutReq) error
-	VerifyJWT(ctx context.Context, req service.VerifyTokenReq) (resp service.VerifyTokenResp, err error)
+	HasAuthenticated(ctx context.Context, req service.HasAuthenticatedReq) (resp service.HasAuthenticatedResp, err error)
 }
 
 func NewAuthzController(authzSvc usecase.AuthzService) AuthzController {
@@ -30,6 +30,6 @@ func (ac *AuthzControllerImpl) Logout(ctx context.Context, req service.LogoutReq
 	return ac.authzSvc.Logout(ctx, req)
 }
 
-func (ac *AuthzControllerImpl) VerifyJWT(ctx context.Context, req service.VerifyTokenReq) (resp service.VerifyTokenResp, err error) {
-	return ac.authzSvc.VerifyJWT(ctx, req)
+func (ac *AuthzControllerImpl) HasAuthenticated(ctx context.Context, req service.HasAuthenticatedReq) (resp service.HasAuthenticatedResp, err error) {
+	return ac.authzSvc.HasAuthenticated(ctx, req)
 }

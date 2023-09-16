@@ -12,10 +12,10 @@ import (
 )
 
 const (
-	insertUsers = `INSERT INTO users (uid, first_name, last_name, email, birthdate, username, password, created_by, updated_by) 
-	VALUES (?,?,?,?,?,?,?,?,?)`
-	selectUsersByEmailPassword = `SELECT u.uid, a.role_uid, r.name as role_name, a.last_active FROM users u JOIN authz a ON u.uid = a.user_uid 
-	JOIN roles r ON a.role_uid = r.uid WHERE u.email = ? AND u.password = ? ORDER BY r.id ASC LIMIT 1`
+	insertUsers = `INSERT INTO users (uid, first_name, last_name, email, birthdate, created_by, updated_by) 
+	VALUES (?,?,?,?,?,?,?)`
+	selectUsersByEmail = `SELECT u.uid, a.role_uid, r.name as role_name, a.last_active FROM users u JOIN authz a ON u.uid = a.user_uid 
+	JOIN roles r ON a.role_uid = r.uid WHERE u.email = ? ORDER BY r.id ASC LIMIT 1`
 	selectUsersWithPagination = `SELECT u.uid, u.first_name, u.last_name, u.email, u.birthdate, u.username, u.created_at, 
 	(SELECT COUNT(*) from users us WHERE us.id = u.id) as per_page, r.name as role_name FROM users u JOIN authz a ON u.uid = a.user_uid 
 	JOIN roles r ON a.role_uid = r.uid %s`
@@ -32,8 +32,7 @@ func NewUsersRepository(db DBExecutor) repository.UsersRepository {
 
 func (ur *UsersRepositoryImpl) CreateUsers(ctx context.Context, req *model.User) error {
 
-	_, err := ur.db.ExecContext(ctx, insertUsers, req.UID, req.FirstName, req.LastName, req.Email, req.Birthdate, req.Username,
-		req.Password, req.CreatedBy, req.UpdatedBy)
+	_, err := ur.db.ExecContext(ctx, insertUsers, req.UID, req.FirstName, req.LastName, req.Email, req.Birthdate, req.CreatedBy, req.UpdatedBy)
 	if err != nil && !strings.Contains(err.Error(), "duplicate") {
 		return err
 	}
@@ -41,10 +40,10 @@ func (ur *UsersRepositoryImpl) CreateUsers(ctx context.Context, req *model.User)
 	return nil
 }
 
-func (ur *UsersRepositoryImpl) ReadUserByEmailPassword(ctx context.Context, req *model.ReadUserByEmailPasswordReq) (resp *model.ReadUserByEmailPasswordResp, err error) {
-	resp = &model.ReadUserByEmailPasswordResp{}
+func (ur *UsersRepositoryImpl) ReadUserByEmail(ctx context.Context, req *model.ReadUserByEmailReq) (resp *model.ReadUserByEmailResp, err error) {
+	resp = &model.ReadUserByEmailResp{}
 
-	err = ur.db.QueryRowContext(ctx, selectUsersByEmailPassword, req.Email, req.Password).
+	err = ur.db.QueryRowContext(ctx, selectUsersByEmail, req.Email).
 		Scan(&resp.UserUID, &resp.RoleUID, &resp.RoleName, &resp.LastActive)
 	if err != nil {
 		if err == sql.ErrNoRows {

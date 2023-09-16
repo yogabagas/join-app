@@ -10,5 +10,4 @@ import (
 func NewAuthzV1(h handler.HandlerImpl, r *mux.Router) {
 	r.HandleFunc("/login", h.Login).Methods(http.MethodPost)
 	r.HandleFunc("/logout", h.Logout).Methods(http.MethodDelete)
-	r.HandleFunc("/token/verify", h.VerifyJWT).Methods(http.MethodGet)
 }
