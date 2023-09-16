@@ -12,6 +12,12 @@ type (
 	ResourcesType int
 
 	KeyID string
+
+	ContextKey string
+
+	CacheKey string
+
+	Gender int
 )
 
 var (
@@ -32,6 +38,16 @@ var (
 	API  ResourcesType = 2
 
 	Default KeyID = "default"
+
+	Claim ContextKey = "claim"
+
+	UserAuth      CacheKey = "auth::user-uid:%s"
+	RoleMenu      CacheKey = "resources::role-uid:%s:type:%d"
+	JWKPrivateKey CacheKey = "jwk::private-key:%s"
+	MenuResource  CacheKey = "resources::type:%d"
+
+	Female Gender = 0
+	Male   Gender = 1
 )
 
 func (pa PassAlgorithm) String() string {
@@ -89,5 +105,24 @@ func ResourceTypeAtoi(s string) ResourcesType {
 		return API
 	default:
 		return 0
+	}
+}
+
+func (ct ContextKey) String() string {
+	return string(ct)
+}
+
+func (g Gender) Int() int {
+	return int(g)
+}
+
+func (g Gender) String() string {
+	switch g.Int() {
+	case Female.Int():
+		return "female"
+	case Male.Int():
+		return "male"
+	default:
+		return ""
 	}
 }

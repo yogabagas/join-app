@@ -8,14 +8,13 @@ import (
 	"github/yogabagas/join-app/domain/repository/sql"
 	"github/yogabagas/join-app/domain/service"
 	"github/yogabagas/join-app/service/resources/presenter"
-	resourcesRepo "github/yogabagas/join-app/service/resources/repository"
 	"github/yogabagas/join-app/shared/util"
 )
 
 type ResourcesServiceImpl struct {
-	cache         cache.Cache
-	resourcesRepo resourcesRepo.ResourcesRepository
-	presenter     presenter.ResourcesPresenter
+	cache     cache.Cache
+	repo      sql.RepositoryRegistry
+	presenter presenter.ResourcesPresenter
 }
 
 type ResourcesService interface {
@@ -25,16 +24,18 @@ type ResourcesService interface {
 
 func NewResourcesService(cache cache.Cache, repository sql.RepositoryRegistry, presenter presenter.ResourcesPresenter) ResourcesService {
 	return &ResourcesServiceImpl{
-		cache:         cache,
-		resourcesRepo: repository.ResourcesRepository(),
-		presenter:     presenter}
+		cache:     cache,
+		repo:      repository,
+		presenter: presenter}
 }
 
 func (rs *ResourcesServiceImpl) CreateResources(ctx context.Context, req service.CreateResourcesReq) error {
 
+	resourcesRepo := rs.repo.ResourcesRepository()
+
 	uID := util.NewULIDGenerate()
 
-	return rs.resourcesRepo.CreateResources(ctx, &model.Resource{
+	return resourcesRepo.CreateResources(ctx, &model.Resource{
 		UID:       uID,
 		Name:      req.Name,
 		Type:      req.Type,
@@ -47,13 +48,15 @@ func (rs *ResourcesServiceImpl) CreateResources(ctx context.Context, req service
 
 func (rs *ResourcesServiceImpl) GetResourcesByType(ctx context.Context, req service.GetResourcesByTypeReq) (resp []service.GetResourcesByTypeResp, err error) {
 
+	resourcesRepo := rs.repo.ResourcesRepository()
+
 	keyCache := fmt.Sprintf("resources::type:%d", req.Type)
 	err = rs.cache.GetObject(ctx, keyCache, &resp)
 	if err == nil {
 		return
 	}
 
-	res, err := rs.resourcesRepo.ReadResourcesByType(ctx, &model.ReadResourcesByTypeReq{
+	res, err := resourcesRepo.ReadResourcesByType(ctx, &model.ReadResourcesByTypeReq{
 		Type: req.Type,
 	})
 	if err != nil {

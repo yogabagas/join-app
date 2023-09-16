@@ -5,13 +5,22 @@ import (
 	"errors"
 	"github/yogabagas/join-app/domain/service"
 	"github/yogabagas/join-app/shared/constant"
-	"github/yogabagas/join-app/shared/util"
 	"github/yogabagas/join-app/transport/rest/handler/response"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
+// UpsertAccess handler
+// @Summary UpsertAccess
+// @Description UpsertAccess for update and insert existing/new access
+// @Tags Access
+// @Produce json
+// @Param access body service.UpsertAccessReq true "Request Upsert Access"
+// @Success 200 {object} response.JSONResponse().APIStatusCreated()
+// @Failure 400 {object} response.JSONResponse
+// @Failure 500 {object} response.JSONResponse
+// @Router /v1/access [PUT]
 func (h *HandlerImpl) UpsertAccess(w http.ResponseWriter, r *http.Request) {
 
 	res := response.NewJSONResponse()
@@ -37,6 +46,17 @@ func (h *HandlerImpl) UpsertAccess(w http.ResponseWriter, r *http.Request) {
 	res.APIStatusCreated().Send(w)
 }
 
+// GetAccessByRoleUID handler
+// @Summary GetAccessByRoleUID
+// @Description GetAccessByRoleUID for get access by role uid
+// @Tags Access
+// @Produce json
+// @Security ApiKeyAuth
+// @Param type path string true "resource type"
+// @Success 200 {object} response.JSONResponse{data=[]service.GetAccessByRoleUIDResp}
+// @Failure 400 {object} response.JSONResponse
+// @Failure 500 {object} response.JSONResponse
+// @Router /v1/access/{type} [GET]
 func (h *HandlerImpl) GetAccessByRoleUID(w http.ResponseWriter, r *http.Request) {
 	res := response.NewJSONResponse()
 
@@ -45,17 +65,7 @@ func (h *HandlerImpl) GetAccessByRoleUID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	token := r.Header.Get("Authorization")
-	if token == "" {
-		res.SetError(response.ErrUnauthorized).SetMessage(errors.New("unauthorized access").Error()).Send(w)
-		return
-	}
-
-	claims, err := util.GetUserData(token)
-	if err != nil {
-		res.SetError(response.ErrUnauthorized).SetMessage(errors.New("jwt is invalid format").Error()).Send(w)
-		return
-	}
+	claims := r.Context().Value(constant.Claim).(service.JWTClaims)
 
 	vars := mux.Vars(r)
 	t, ok := vars["type"]

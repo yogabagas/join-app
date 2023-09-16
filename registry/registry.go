@@ -55,6 +55,7 @@ func (m *module) NewAppController() controller.AppController {
 	return controller.AppController{
 		AccessController:    m.NewAccessController(),
 		AuthzController:     m.NewAuthzController(),
+		JWKController:       m.NewJWKController(),
 		ResourcesController: m.NewResourcesController(),
 		RolesController:     m.NewRolesController(),
 		UsersController:     m.NewUsersController(),

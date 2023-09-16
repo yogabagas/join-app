@@ -8,11 +8,7 @@ import (
 	"github/yogabagas/join-app/domain/repository/cache"
 	"github/yogabagas/join-app/domain/repository/sql"
 	"github/yogabagas/join-app/domain/service"
-	authzRepo "github/yogabagas/join-app/service/authz/repository"
-	jwkRepo "github/yogabagas/join-app/service/jwk/repository"
-	rolesRepo "github/yogabagas/join-app/service/roles/repository"
 	"github/yogabagas/join-app/service/users/presenter"
-	usersRepo "github/yogabagas/join-app/service/users/repository"
 	"github/yogabagas/join-app/shared/util"
 
 	"github/yogabagas/join-app/shared/constant"
@@ -20,10 +16,7 @@ import (
 )
 
 type UsersServiceImpl struct {
-	authzRepo authzRepo.AuthzRepository
-	jwkRepo   jwkRepo.JWKRepository
-	rolesRepo rolesRepo.RolesRepository
-	usersRepo usersRepo.UsersRepository
+	repo      sql.RepositoryRegistry
 	cache     cache.Cache
 	presenter presenter.UsersPresenter
 }
@@ -35,10 +28,7 @@ type UsersService interface {
 
 func NewUsersService(repository sql.RepositoryRegistry, cache cache.Cache, presenter presenter.UsersPresenter) UsersService {
 	return &UsersServiceImpl{
-		authzRepo: repository.AuthzRepository(),
-		jwkRepo:   repository.JWKRepository(),
-		rolesRepo: repository.RolesRepository(),
-		usersRepo: repository.UserRepository(),
+		repo:      repository,
 		cache:     cache,
 		presenter: presenter,
 	}
@@ -46,7 +36,10 @@ func NewUsersService(repository sql.RepositoryRegistry, cache cache.Cache, prese
 
 func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateUsersReq) error {
 
-	role, err := us.rolesRepo.ReadRolesByID(ctx, &model.ReadRolesByIDReq{
+	authzRepo := us.repo.AuthzRepository()
+	rolesRepo := us.repo.RolesRepository()
+
+	role, err := rolesRepo.ReadRolesByID(ctx, &model.ReadRolesByIDReq{
 		ID: req.RoleID,
 	})
 	if err != nil {
@@ -67,24 +60,47 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 
 	userUID := util.NewULIDGenerate()
 
-	err = us.usersRepo.CreateUsers(ctx, &model.User{
-		UID:       userUID,
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
-		Birthdate: hbd,
-		Email:     req.Email,
-		Username:  req.Username,
-		Password:  util.Base64(pwd),
-		CreatedBy: userUID,
-		UpdatedBy: userUID,
-	})
+	var InTransaction = func(rr sql.RepositoryRegistry) (out interface{}, err error) {
+
+		usersRepo := rr.UsersRepository()
+		userCredentialsRepo := rr.UserCredentialsRepository()
+
+		err = usersRepo.CreateUsers(ctx, &model.User{
+			UID:         userUID,
+			FirstName:   req.FirstName,
+			LastName:    req.LastName,
+			Birthdate:   hbd,
+			Email:       req.Email,
+			Gender:      req.Gender,
+			Country:     req.Country,
+			Description: req.Bio,
+			CreatedBy:   userUID,
+			UpdatedBy:   userUID,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		err = userCredentialsRepo.InsertCredential(ctx, &model.UserCredential{
+			UserUID:  userUID,
+			Username: req.Username,
+			Password: util.Base64(pwd),
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, nil
+	}
+
+	_, err = us.repo.DoInTransaction(ctx, InTransaction)
 	if err != nil {
 		return err
 	}
 
 	authzUID := util.NewULIDGenerate()
 
-	err = us.authzRepo.CreateAuthz(ctx, &model.Authz{
+	err = authzRepo.CreateAuthz(ctx, &model.Authz{
 		UID:       authzUID,
 		UserUID:   userUID,
 		RoleUID:   role.UID,
@@ -99,7 +115,9 @@ func (us *UsersServiceImpl) CreateUsers(ctx context.Context, req service.CreateU
 
 func (us *UsersServiceImpl) GetUsersWithPagination(ctx context.Context, req service.GetUsersWithPaginationReq) (resp service.GetUsersWithPaginationResp, err error) {
 
-	users, err := us.usersRepo.ReadUsersWithPagination(ctx, &model.ReadUsersWithPaginationReq{
+	usersRepo := us.repo.UsersRepository()
+
+	users, err := usersRepo.ReadUsersWithPagination(ctx, &model.ReadUsersWithPaginationReq{
 		Fullname: req.Fullname,
 		Limit:    req.Limit,
 		Offset:   util.PageToOffset(req.Limit, req.Page),
@@ -108,7 +126,7 @@ func (us *UsersServiceImpl) GetUsersWithPagination(ctx context.Context, req serv
 		return
 	}
 
-	count, err := us.usersRepo.CountUsers(ctx, &model.CountUsersReq{
+	count, err := usersRepo.CountUsers(ctx, &model.CountUsersReq{
 		IsDeleted: constant.False.Int(),
 	})
 	if err != nil {

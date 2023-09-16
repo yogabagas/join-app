@@ -8,7 +8,7 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 func GetUserData(token string) (resp service.JWTClaims, err error) {
@@ -25,7 +25,7 @@ func GetUserData(token string) (resp service.JWTClaims, err error) {
 
 	if claims, ok := tokenParse.Claims.(jwt.MapClaims); ok {
 		if subject, ok := claims["sub"]; ok {
-			resp.UserUID = subject.(string)
+			resp.Sub = subject.(string)
 		}
 		if role, ok := claims["role_uid"]; ok {
 			resp.RoleUID = role.(string)

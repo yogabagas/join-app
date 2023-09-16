@@ -8,14 +8,13 @@ import (
 	"github/yogabagas/join-app/domain/repository/sql"
 	"github/yogabagas/join-app/domain/service"
 	"github/yogabagas/join-app/service/access/presenter"
-	"github/yogabagas/join-app/service/access/repository"
 	"github/yogabagas/join-app/shared/util"
 )
 
 type AccessServiceImpl struct {
-	accessRepo repository.AccessRepository
-	cache      cache.Cache
-	presenter  presenter.AccessPresenter
+	repo      sql.RepositoryRegistry
+	cache     cache.Cache
+	presenter presenter.AccessPresenter
 }
 
 type AccessService interface {
@@ -25,12 +24,14 @@ type AccessService interface {
 
 func NewAccessService(repository sql.RepositoryRegistry, cache cache.Cache, presenter presenter.AccessPresenter) AccessService {
 	return &AccessServiceImpl{
-		accessRepo: repository.AccessRepository(),
-		cache:      cache,
-		presenter:  presenter}
+		repo:      repository,
+		cache:     cache,
+		presenter: presenter}
 }
 
 func (as *AccessServiceImpl) UpsertAccess(ctx context.Context, req service.UpsertAccessReq) error {
+
+	accessRepo := as.repo.AccessRepository()
 
 	accessReqs := []*model.Access{}
 
@@ -48,10 +49,12 @@ func (as *AccessServiceImpl) UpsertAccess(ctx context.Context, req service.Upser
 		}
 	}
 
-	return as.accessRepo.UpsertAccess(ctx, accessReqs)
+	return accessRepo.UpsertAccess(ctx, accessReqs)
 }
 
 func (as *AccessServiceImpl) GetAccessByRoleUID(ctx context.Context, req service.GetAccessByRoleUIDReq) (resp []service.GetAccessByRoleUIDResp, err error) {
+
+	accessRepo := as.repo.AccessRepository()
 
 	keyCache := fmt.Sprintf("resources::role-uid:%s:type:%d", req.RoleUID, req.Type)
 	err = as.cache.GetObject(ctx, keyCache, &resp)
@@ -59,7 +62,7 @@ func (as *AccessServiceImpl) GetAccessByRoleUID(ctx context.Context, req service
 		return
 	}
 
-	res, err := as.accessRepo.ReadAccessByRoleUID(ctx, &model.ReadAccessByRoleUIDReq{
+	res, err := accessRepo.ReadAccessByRoleUID(ctx, &model.ReadAccessByRoleUIDReq{
 		RoleUID: req.RoleUID,
 		Type:    req.Type,
 	})
