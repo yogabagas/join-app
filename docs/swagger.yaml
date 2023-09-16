@@ -177,6 +177,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: UpsertAccess
       tags:
       - Access
@@ -264,7 +266,7 @@ paths:
             $ref: '#/definitions/response.JSONResponse'
       security:
       - ApiKeyAuth: []
-      summary: Lgout
+      summary: Logout
       tags:
       - Users
   /v1/resources:
@@ -292,6 +294,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Create New Resources
       tags:
       - Resources
@@ -320,6 +324,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Create New Roles
       tags:
       - Roles
@@ -359,6 +365,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: GetUsersWithPagination
       tags:
       - Users

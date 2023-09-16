@@ -16,6 +16,7 @@ import (
 // @Description UpsertAccess for update and insert existing/new access
 // @Tags Access
 // @Produce json
+// @Security ApiKeyAuth
 // @Param access body service.UpsertAccessReq true "Request Upsert Access"
 // @Success 200 {object} response.JSONResponse().APIStatusCreated()
 // @Failure 400 {object} response.JSONResponse
