@@ -27,3 +27,23 @@ type ModuleMaterial struct {
 	UpdatedBy   string
 	UpdatedAt   time.Time
 }
+
+type ReadModulesWithPaginationReq struct {
+	UID    string
+	Name   string
+	Limit  int
+	Offset int
+}
+
+type ReadModulesWithPaginationResp struct {
+	Modules []Module
+	PerPage int
+}
+
+type CountModulesReq struct {
+	IsDeleted int
+}
+
+type CountModulesResp struct {
+	Total int
+}

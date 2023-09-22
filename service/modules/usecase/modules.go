@@ -3,22 +3,28 @@ package usecase
 import (
 	"context"
 	"github/yogabagas/join-app/domain/model"
+	"github/yogabagas/join-app/domain/repository/sql"
 	"github/yogabagas/join-app/domain/service"
+	"github/yogabagas/join-app/service/modules/presenter"
 	coursesRepo "github/yogabagas/join-app/service/modules/repository"
+	"github/yogabagas/join-app/shared/constant"
 	"github/yogabagas/join-app/shared/util"
 )
 
 type ModulesServiceImpl struct {
 	modulesRepo coursesRepo.ModulesRepository
+	presenter   presenter.ModulesPresenter
 }
 
 type ModulesService interface {
 	CreateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error
+	GetModulesWithPagination(ctx context.Context, req service.GetModulesWithPaginationReq) (service.GetModulesWithPaginationResp, error)
 }
 
-func NewModulesService(modulesRepo coursesRepo.ModulesRepository) ModulesService {
+func NewModulesService(repository sql.RepositoryRegistry, presenter presenter.ModulesPresenter) ModulesService {
 	return &ModulesServiceImpl{
-		modulesRepo: modulesRepo}
+		modulesRepo: repository.ModulesRepository(),
+		presenter:   presenter}
 }
 
 func (cs *ModulesServiceImpl) CreateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error {
@@ -46,4 +52,26 @@ func (cs *ModulesServiceImpl) CreateModules(ctx context.Context, req service.Cre
 	}
 
 	return err
+}
+
+func (cs *ModulesServiceImpl) GetModulesWithPagination(ctx context.Context, req service.GetModulesWithPaginationReq) (resp service.GetModulesWithPaginationResp, err error) {
+
+	modules, err := cs.modulesRepo.ReadModulesWithPagination(ctx, &model.ReadModulesWithPaginationReq{
+		UID:    req.UID,
+		Name:   req.Name,
+		Limit:  req.Limit,
+		Offset: util.PageToOffset(req.Limit, req.Page),
+	})
+	if err != nil {
+		return
+	}
+
+	count, err := cs.modulesRepo.CountModules(ctx, &model.CountModulesReq{
+		IsDeleted: constant.False.Int(),
+	})
+	if err != nil {
+		return
+	}
+
+	return cs.presenter.GetModulesWithPagination(ctx, req, modules, count)
 }

@@ -13,6 +13,7 @@ type ModulesControllerImpl struct {
 
 type ModulesController interface {
 	CreateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error
+	GetModulesWithPagination(ctx context.Context, req service.GetModulesWithPaginationReq) (service.GetModulesWithPaginationResp, error)
 }
 
 func NewModulesController(modulesService usecase.ModulesService) ModulesController {
@@ -21,4 +22,8 @@ func NewModulesController(modulesService usecase.ModulesService) ModulesControll
 
 func (cs *ModulesControllerImpl) CreateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error {
 	return cs.modulesSvc.CreateModules(ctx, req, userData)
+}
+
+func (cs *ModulesControllerImpl) GetModulesWithPagination(ctx context.Context, req service.GetModulesWithPaginationReq) (service.GetModulesWithPaginationResp, error) {
+	return cs.modulesSvc.GetModulesWithPagination(ctx, req)
 }

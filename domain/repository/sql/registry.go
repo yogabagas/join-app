@@ -24,7 +24,7 @@ type RepositoryRegistry interface {
 	RolesRepository() rolesRepo.RolesRepository
 	ResourcesRepository() resourcesRepo.ResourcesRepository
 	UserRepository() usersRepo.UsersRepository
-	CoursesRepository() coursesRepo.ModulesRepository
+	ModulesRepository() coursesRepo.ModulesRepository
 
 	DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error)
 }
@@ -61,7 +61,7 @@ func (r RepositoryRegistryImpl) UserRepository() usersRepo.UsersRepository {
 	return NewUsersRepository(r.db, r.cache)
 }
 
-func (r RepositoryRegistryImpl) CoursesRepository() coursesRepo.ModulesRepository {
+func (r RepositoryRegistryImpl) ModulesRepository() coursesRepo.ModulesRepository {
 	if r.dbExecutor != nil {
 		return NewModulesRepository(r.dbExecutor)
 	}

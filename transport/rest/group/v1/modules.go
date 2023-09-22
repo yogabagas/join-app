@@ -8,9 +8,8 @@ import (
 )
 
 func NewModulesV1(h handler.HandlerImpl, r *mux.Router) {
-	r.HandleFunc("/module/create", h.CreateModules).Methods(http.MethodPost)
-	r.HandleFunc("/modules", h.GetCourses).Methods(http.MethodGet)
-	r.HandleFunc("/modules/:id", h.UpdateCourses).Methods(http.MethodPut)
-	r.HandleFunc("/modules/:id", h.CoursesByID).Methods(http.MethodGet)
+	r.HandleFunc("/modules", h.CreateModules).Methods(http.MethodPost)
+	r.HandleFunc("/modules", h.GetModulesWithPagination).Methods(http.MethodGet)
+	r.HandleFunc("/modules/:id", h.UpdateCourses).Methods(http.MethodPost)
 	r.HandleFunc("/modules/:id", h.DeleteCourse).Methods(http.MethodDelete)
 }

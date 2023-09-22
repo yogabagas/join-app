@@ -13,6 +13,38 @@ type CreateModulesReq struct {
 	ModuleMaterial []ModuleMaterial `json:"module_materials"`
 }
 
+type ModuleMaterial struct {
+	Topic       string `json:"topic"`
+	Description string `json:"description"`
+}
+
+type GetModulesWithPaginationReq struct {
+	UID   string `json:"uid"`
+	Name  string `json:"name"`
+	Limit int    `json:"limit"`
+	Page  int    `json:"page"`
+}
+
+type ModuleResp struct {
+	UID             string               `json:"uid"`
+	Name            string               `json:"name"`
+	Description     string               `json:"description"`
+	File            string               `json:"file"`
+	ModuleMaterials []ModuleMaterialResp `json:"module_materials"`
+}
+
+type ModuleMaterialResp struct {
+	UID         string `json:"uid"`
+	ModuleUID   string `json:"module_uid"`
+	Topic       string `json:"topic"`
+	Description string `json:"description"`
+}
+
+type GetModulesWithPaginationResp struct {
+	Modules    []ModuleResp `json:"modules"`
+	Pagination Pagination   `json:"pagination"`
+}
+
 func (c CreateModulesReq) SetCreateModuleReq(r *http.Request) (CreateModulesReq, error) {
 	c.Name = r.FormValue("name")
 	c.Description = r.FormValue("description")
@@ -22,11 +54,6 @@ func (c CreateModulesReq) SetCreateModuleReq(r *http.Request) (CreateModulesReq,
 	c.File = filename
 
 	return c, err
-}
-
-type ModuleMaterial struct {
-	Topic       string `json:"topic"`
-	Description string `json:"description"`
 }
 
 func parseFile(r *http.Request) (string, error) {
