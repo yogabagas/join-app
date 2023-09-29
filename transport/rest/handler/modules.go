@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"github/yogabagas/join-app/domain/service"
 	"github/yogabagas/join-app/shared/util"
 	"github/yogabagas/join-app/transport/rest/handler/response"
@@ -122,14 +123,17 @@ func (h *HandlerImpl) UpdateCourses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req service.CreateResourcesReq
+	var req service.CreateModulesReq
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
 		return
 	}
 
-	err := h.Controller.ResourcesController.CreateResources(r.Context(), req)
+	userData := new(util.UserData)
+	userData = userData.GetUserData(r)
+
+	err := h.Controller.ModulesController.UpdateModules(r.Context(), req, userData)
 	if err != nil {
 		res.SetError(response.ErrInternalServerError).SetMessage(err.Error()).Send(w)
 		return
@@ -153,19 +157,15 @@ func (h *HandlerImpl) DeleteCourse(w http.ResponseWriter, r *http.Request) {
 
 	res := response.NewJSONResponse()
 
-	if r.Method != http.MethodPost {
+	if r.Method != http.MethodDelete {
 		res.SetError(response.ErrMethodNotAllowed).Send(w)
 		return
 	}
+	vars := mux.Vars(r)
+	userData := new(util.UserData)
+	userData = userData.GetUserData(r)
 
-	var req service.CreateResourcesReq
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
-		return
-	}
-
-	err := h.Controller.ResourcesController.CreateResources(r.Context(), req)
+	err := h.Controller.ModulesController.DeleteModules(r.Context(), vars["uid"], *userData)
 	if err != nil {
 		res.SetError(response.ErrInternalServerError).SetMessage(err.Error()).Send(w)
 		return

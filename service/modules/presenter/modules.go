@@ -25,6 +25,7 @@ func (up *ModulesPresenterImpl) GetModulesWithPagination(ctx context.Context, re
 		for _, v := range modulesResp.Modules {
 
 			module := service.ModuleResp{
+				UID:         v.UID,
 				Name:        v.Name,
 				Description: v.Description,
 				File:        v.File,

@@ -11,11 +11,12 @@ import (
 
 const (
 	insertModules              = `INSERT INTO modules (uid, name, description, file, created_by ) VALUES (?,?,?,?,?)`
+	updateModules              = `UPDATE modules SET name=?, description=?, file=?, updated_by='' WHERE uid=?`
 	insertModuleMaterials      = `INSERT INTO module_materials (uid, module_uid, topic, description, created_by ) VALUES (?,?,?,?,?)`
-	selectModuleWithPagination = `SELECT u.uid, u.first_name, u.last_name, u.email, u.birthdate, u.username, u.created_at, 
-	(SELECT COUNT(*) from users us WHERE us.id = u.id) as per_page, r.name as role_name FROM users u JOIN authz a ON u.uid = a.user_uid 
-	JOIN roles r ON a.role_uid = r.uid %s`
-	selectCountModules = `SELECT COUNT(*) FROM users WHERE is_deleted = ?`
+	updateModuleMaterials      = `UPDATE module_materials SET module_uid= ?, topic=?, description=?, updated_by=?`
+	selectModuleWithPagination = `SELECT uid, name, description, file FROM modules`
+	selectCountModules         = `SELECT COUNT(*) FROM modules WHERE is_deleted = ?`
+	deleteModules              = `UPDATE modules SET is_deleted = 1, updated_by=? WHERE uid=?`
 )
 
 type ModulesRepositoryImpl struct {
@@ -36,6 +37,16 @@ func (rr *ModulesRepositoryImpl) CreateModules(ctx context.Context, req *model.M
 	return nil
 }
 
+func (rr *ModulesRepositoryImpl) UpdateModules(ctx context.Context, req *model.Module) error {
+
+	_, err := rr.db.ExecContext(ctx, updateModules, req.Name, req.Description, req.File, req.UpdatedBy, req.UID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (rr *ModulesRepositoryImpl) CreateModuleMaterials(ctx context.Context, req *model.ModuleMaterial) error {
 
 	_, err := rr.db.ExecContext(ctx, insertModuleMaterials, req.UID, req.ModuleUID, req.Topic, req.Description, req.CreatedBy)
@@ -46,15 +57,25 @@ func (rr *ModulesRepositoryImpl) CreateModuleMaterials(ctx context.Context, req 
 	return nil
 }
 
-func (ur *ModulesRepositoryImpl) ReadModulesWithPagination(ctx context.Context, req *model.ReadModulesWithPaginationReq) (resp *model.ReadModulesWithPaginationResp, err error) {
+func (rr *ModulesRepositoryImpl) UpdateModuleMaterials(ctx context.Context, req *model.ModuleMaterial) error {
 
-	cond := fmt.Sprintf("WHERE MATCH (u.name) AGAINST ('%s*' IN BOOLEAN MODE) LIMIT %d OFFSET %d", req.Name, req.Limit, req.Offset)
-
-	if req.Name == "" {
-		cond = fmt.Sprintf("LIMIT %d OFFSET %d", req.Limit, req.Offset)
+	_, err := rr.db.ExecContext(ctx, updateModuleMaterials, req.ModuleUID, req.Topic, req.Description, req.UpdatedBy, req.UID)
+	if err != nil {
+		return err
 	}
 
-	q := fmt.Sprintf(selectModuleWithPagination, cond)
+	return nil
+}
+
+func (ur *ModulesRepositoryImpl) ReadModulesWithPagination(ctx context.Context, req *model.ReadModulesWithPaginationReq) (resp *model.ReadModulesWithPaginationResp, err error) {
+
+	cond := fmt.Sprintf("WHERE name like %s LIMIT %d OFFSET %d", fmt.Sprint("'%"+req.Name+"%'"), req.Limit, req.Offset)
+
+	if req.Name == "" {
+		cond = fmt.Sprintf(" LIMIT %d OFFSET %d", req.Limit, req.Offset)
+	}
+
+	q := selectModuleWithPagination + cond
 
 	rows, err := ur.db.QueryContext(ctx, q)
 
@@ -66,14 +87,13 @@ func (ur *ModulesRepositoryImpl) ReadModulesWithPagination(ctx context.Context, 
 
 	for rows.Next() {
 		module := model.Module{}
-		var perPage int
 
 		err = rows.Scan(&module.UID, &module.Name, &module.Description, &module.File)
 		if err != nil {
 			return nil, err
 		}
 
-		resp.PerPage += perPage
+		resp.PerPage += 1
 		resp.Modules = append(resp.Modules, module)
 	}
 	return resp, nil
@@ -88,4 +108,13 @@ func (ur *ModulesRepositoryImpl) CountModules(ctx context.Context, req *model.Co
 		return nil, err
 	}
 	return
+}
+
+func (ur *ModulesRepositoryImpl) DeleteModules(ctx context.Context, uid string, userUUID string) error {
+	_, err := ur.db.ExecContext(ctx, deleteModules, uid, userUUID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

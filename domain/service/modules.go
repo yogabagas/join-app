@@ -7,6 +7,7 @@ import (
 )
 
 type CreateModulesReq struct {
+	UID            string           `json:"uid"`
 	Name           string           `json:"name"`
 	Description    string           `json:"description"`
 	File           string           `json:"-"`
@@ -14,6 +15,7 @@ type CreateModulesReq struct {
 }
 
 type ModuleMaterial struct {
+	UID         string `json:"uid"`
 	Topic       string `json:"topic"`
 	Description string `json:"description"`
 }

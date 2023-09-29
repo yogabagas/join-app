@@ -10,10 +10,10 @@ func (m *module) NewModulesPresenter() presenter.ModulesPresenter {
 	return presenter.NewModulesPresenter()
 }
 
-func (m *module) NewCoursesRegistry() usecase.ModulesService {
+func (m *module) NewModulesRegistry() usecase.ModulesService {
 	return usecase.NewModulesService(m.NewRepositoryRegistry(), m.NewModulesPresenter())
 }
 
 func (m *module) NewCoursesController() controller.ModulesController {
-	return controller.NewModulesController(m.NewCoursesRegistry())
+	return controller.NewModulesController(m.NewModulesRegistry())
 }

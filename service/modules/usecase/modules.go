@@ -18,7 +18,9 @@ type ModulesServiceImpl struct {
 
 type ModulesService interface {
 	CreateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error
+	UpdateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error
 	GetModulesWithPagination(ctx context.Context, req service.GetModulesWithPaginationReq) (service.GetModulesWithPaginationResp, error)
+	DeleteModules(ctx context.Context, uid string, userData util.UserData) error
 }
 
 func NewModulesService(repository sql.RepositoryRegistry, presenter presenter.ModulesPresenter) ModulesService {
@@ -54,6 +56,31 @@ func (cs *ModulesServiceImpl) CreateModules(ctx context.Context, req service.Cre
 	return err
 }
 
+func (cs *ModulesServiceImpl) UpdateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error {
+
+	err := cs.modulesRepo.UpdateModules(ctx, &model.Module{
+		UID:         req.UID,
+		Name:        req.Name,
+		Description: req.Description,
+		File:        req.File,
+		UpdatedBy:   userData.UserUUID,
+	})
+
+	for _, moduleMaterial := range req.ModuleMaterial {
+
+		_ = cs.modulesRepo.UpdateModuleMaterials(ctx, &model.ModuleMaterial{
+			UID:         moduleMaterial.UID,
+			ModuleUID:   req.UID,
+			Topic:       moduleMaterial.Topic,
+			Description: moduleMaterial.Description,
+			UpdatedBy:   userData.UserUUID,
+		})
+
+	}
+
+	return err
+}
+
 func (cs *ModulesServiceImpl) GetModulesWithPagination(ctx context.Context, req service.GetModulesWithPaginationReq) (resp service.GetModulesWithPaginationResp, err error) {
 
 	modules, err := cs.modulesRepo.ReadModulesWithPagination(ctx, &model.ReadModulesWithPaginationReq{
@@ -74,4 +101,8 @@ func (cs *ModulesServiceImpl) GetModulesWithPagination(ctx context.Context, req 
 	}
 
 	return cs.presenter.GetModulesWithPagination(ctx, req, modules, count)
+}
+
+func (rs *ModulesServiceImpl) DeleteModules(ctx context.Context, uid string, userData util.UserData) error {
+	return rs.modulesRepo.DeleteModules(ctx, uid, userData.UserUUID)
 }
