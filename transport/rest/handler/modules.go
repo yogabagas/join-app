@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github/yogabagas/join-app/domain/service"
 	"github/yogabagas/join-app/shared/util"
@@ -30,8 +29,13 @@ func (h *HandlerImpl) CreateModules(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req service.CreateModulesReq
+	req.Name = r.FormValue("name")
+	req.Description = r.FormValue("description")
+	req.ModuleMaterial = service.ParseRequestModuleMaterial(r.FormValue("module_materials"))
 
-	req, err := req.SetCreateModuleReq(r)
+	filename, err := util.ParseFileUpload(r, "file", "storage")
+	req.File = filename
+
 	if err != nil {
 		res.SetError(response.ErrBadRequest).Send(w)
 		return
@@ -123,11 +127,20 @@ func (h *HandlerImpl) UpdateCourses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req service.CreateModulesReq
+	var req service.UpdateModulesReq
+	req.Name = r.FormValue("name")
+	req.Description = r.FormValue("description")
+	req.ModuleMaterial = service.ParseRequestModuleMaterial(r.FormValue("module_materials"))
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
-		return
+	_, handler, _ := r.FormFile("new_file")
+	if handler.Filename != "" {
+		filename, err := util.ParseFileUpload(r, "new_file", "storage")
+		req.File = filename
+
+		if err != nil {
+			res.SetError(response.ErrBadRequest).Send(w)
+			return
+		}
 	}
 
 	userData := new(util.UserData)

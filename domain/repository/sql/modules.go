@@ -11,9 +11,9 @@ import (
 
 const (
 	insertModules              = `INSERT INTO modules (uid, name, description, file, created_by ) VALUES (?,?,?,?,?)`
-	updateModules              = `UPDATE modules SET name=?, description=?, file=?, updated_by='' WHERE uid=?`
+	updateModules              = `UPDATE modules SET name=?, description=?, file=?, updated_by=? WHERE uid=?`
 	insertModuleMaterials      = `INSERT INTO module_materials (uid, module_uid, topic, description, created_by ) VALUES (?,?,?,?,?)`
-	updateModuleMaterials      = `UPDATE module_materials SET module_uid= ?, topic=?, description=?, updated_by=?`
+	updateModuleMaterials      = `UPDATE module_materials SET module_uid= ?, topic=?, description=?, updated_by=? WHERE uid=?`
 	selectModuleWithPagination = `SELECT uid, name, description, file FROM modules`
 	selectCountModules         = `SELECT COUNT(*) FROM modules WHERE is_deleted = ?`
 	deleteModules              = `UPDATE modules SET is_deleted = 1, updated_by=? WHERE uid=?`

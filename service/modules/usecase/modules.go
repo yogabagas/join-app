@@ -18,7 +18,7 @@ type ModulesServiceImpl struct {
 
 type ModulesService interface {
 	CreateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error
-	UpdateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error
+	UpdateModules(ctx context.Context, req service.UpdateModulesReq, userData *util.UserData) error
 	GetModulesWithPagination(ctx context.Context, req service.GetModulesWithPaginationReq) (service.GetModulesWithPaginationResp, error)
 	DeleteModules(ctx context.Context, uid string, userData util.UserData) error
 }
@@ -56,7 +56,7 @@ func (cs *ModulesServiceImpl) CreateModules(ctx context.Context, req service.Cre
 	return err
 }
 
-func (cs *ModulesServiceImpl) UpdateModules(ctx context.Context, req service.CreateModulesReq, userData *util.UserData) error {
+func (cs *ModulesServiceImpl) UpdateModules(ctx context.Context, req service.UpdateModulesReq, userData *util.UserData) error {
 
 	err := cs.modulesRepo.UpdateModules(ctx, &model.Module{
 		UID:         req.UID,
