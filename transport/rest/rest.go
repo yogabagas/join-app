@@ -102,6 +102,7 @@ func NewRest(o *Option) *Handler {
 func (h *Handler) Serve() {
 
 	log.Printf("HTTP serve at : %s%s", config.GlobalCfg.App.Host, config.GlobalCfg.App.Port)
+	log.Printf(".....")
 
 	srv := &http.Server{
 		Handler:      h.option.Mux,
