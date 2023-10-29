@@ -7,12 +7,19 @@
         "write_timeout": 30,
         "jwt_secret": "secret"
     },
+    "jwk": {
+        "size": 1024,
+        "key_id": "default",
+        "alg": "RS256",
+        "use": "sig",
+        "ttl_in_hours": 730
+    },
     "db": {
         "sql": {
             "user": "root",
-            "password": "P@ssw0rd",
+            "password": "root",
             "host": "localhost:3306",
-            "schema": "mentoring"
+            "schema": "printindb"
         }
     },
     "cache": {
@@ -27,8 +34,18 @@
             {
                 "endpoint": "/v1/login",
                 "methods": ["POST"]
+            },
+            {
+                "endpoint": "/swagger/*",
+                "methods": ["GET"]
+            }, 
+            {
+                "endpoint": "/v1/users",
+                "methods": ["POST"]
             }
         ]
     },
-    "password_alg": "sha"
+    "password_alg": "sha",
+    "token_exp": 28800,
+    "refresh_token_exp": 86400
 }

@@ -2,7 +2,7 @@ CREATE TABLE `resources` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `uid` varchar(100) NOT NULL,
     `name` varchar(255) NOT NULL,
-    `parent_uid` varchar(255) DEFAULT NULL,
+    `parent_uid` varchar(100) DEFAULT NULL,
     `type` smallint(1) NOT NULL,
     `action` varchar(50) NOT NULL,
     `is_deleted` boolean NOT NULL DEFAULT 0,

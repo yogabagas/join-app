@@ -1,17 +1,26 @@
-package redis
+package cache
 
 import (
 	"context"
-	"github/yogabagas/join-app/pkg/cache"
 
 	"github.com/go-redis/redis/v8"
 )
 
-func (c *Cache) Publish(ctx context.Context, channel, message string) error {
+type cachePubSub struct {
+	redisPubSub *redis.PubSub
+}
+
+type Subscriber interface {
+	Channel() <-chan string
+	ReceiveMessage(ctx context.Context) (string, error)
+	Close() error
+}
+
+func (c *CacheImpl) Publish(ctx context.Context, channel, message string) error {
 	return c.client.Publish(ctx, channel, message).Err()
 }
 
-func (c *Cache) Subscribe(ctx context.Context, topic string) (cache.Subscriber, error) {
+func (c *CacheImpl) Subscribe(ctx context.Context, topic string) (Subscriber, error) {
 	redisPubSub := c.client.Subscribe(ctx, topic)
 	pubSub := newCachePubSub(redisPubSub)
 
@@ -23,17 +32,6 @@ func (c *Cache) Subscribe(ctx context.Context, topic string) (cache.Subscriber, 
 	return pubSub, nil
 }
 
-type cachePubSub struct {
-	redisPubSub *redis.PubSub
-}
-
-func newCachePubSub(pubSub *redis.PubSub) *cachePubSub {
-	return &cachePubSub{
-		redisPubSub: pubSub,
-	}
-}
-
-// Channel return string channel that will send the message payload
 func (ps *cachePubSub) Channel() <-chan string {
 	msgChan := make(chan string)
 
@@ -63,4 +61,10 @@ func (ps *cachePubSub) ReceiveMessage(ctx context.Context) (string, error) {
 // Close end redis pub-sub connection
 func (ps *cachePubSub) Close() error {
 	return ps.redisPubSub.Close()
+}
+
+func newCachePubSub(pubSub *redis.PubSub) *cachePubSub {
+	return &cachePubSub{
+		redisPubSub: pubSub,
+	}
 }
