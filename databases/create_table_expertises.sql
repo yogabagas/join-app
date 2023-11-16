@@ -8,5 +8,5 @@ CREATE TABLE `expertises` (
     `updated_by` varchar(100) NOT NULL,
     `updated_at` datetime NOT NULL DEFAULT now(),
     PRIMARY KEY (`id`),
-    UNIQUE KEY (`uid`)
+    UNIQUE KEY (`uid`),
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
