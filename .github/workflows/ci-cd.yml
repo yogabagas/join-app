@@ -64,7 +64,7 @@ jobs:
             pwd
             docker pull yogabagas/join-app:latest
             docker-compose -f docker-compose-app-bundle-prod.yml down --remove-orphans
-            docker compose -f docker-compose.app-bundle-prod.yml --profile tools run --rm migrate create -ext sql -dir /v1 create_user_table
+            docker compose -f docker-compose-app-bundle-prod.yml --profile tools run --rm migrate create -ext sql -dir /v1 create_user_table
             docker-compose -f docker-compose-app-bundle-prod.yml --profile tools run --rm migrate -path=join-app:/app/database/migration/v1 -verbose up
             docker image prune -f
             docker cp config/config.prod.json join-app:/app/config/files/config.prod.json
