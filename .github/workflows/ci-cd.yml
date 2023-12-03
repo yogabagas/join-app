@@ -63,8 +63,10 @@ jobs:
           script: |
             pwd
             docker pull yogabagas/join-app:latest
-            docker-compose -f docker-compose-app-bundle-prod.yml down --remove-orphans
-            docker-compose -f docker-compose-app-bundle-prod.yml --profile tools run --rm migrate -path=/app/database/migration/v1/ -verbose up
+            docker-compose -f docker-compose-app-prod.yml down --remove-orphans
+            docker-compose -f docker-compose-app-prod.yml up -d
+            docker-compose -f docker-compose-db-prod.yml --profile tools run --rm migrate -verbose up
+            docker-compose -f docker-compose-cache-prod.yml up -d
             docker image prune -f
             docker cp config/config.prod.json join-app:/app/config/files/config.prod.json
       
