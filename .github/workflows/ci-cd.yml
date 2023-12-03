@@ -61,6 +61,7 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            pwd
             docker pull yogabagas/join-app:latest
             docker-compose -f docker-compose-app-bundle-prod.yml down --remove-orphans
             docker compose -f docker-compose.app-bundle-prod.yml --profile tools run --rm migrate create -ext sql -dir /v1 create_user_table
