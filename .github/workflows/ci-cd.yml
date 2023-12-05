@@ -67,7 +67,7 @@ jobs:
             docker-compose -f docker-compose-app-prod.yml up -d
             docker-compose -f docker-compose-db-prod.yml up -d
             docker-compose -f docker-compose-cache-prod.yml up -d
-            docker run -v /usr/src/app/database/migration/v1:/migrations --network host migrate/migrate -path=/migrations/ -database mysql://root:YgJ58cxK%25m8p@tcp'(joindb:3306)'/joindb?parseTime=true up 2
+            docker run -v /usr/src/app/database/migration/v1:/migrations --network fullstack migrate/migrate -path=/migrations/ -database mysql://root:YgJ58cxK%25m8p@tcp'(joindb:3306)'/joindb?parseTime=true up 2
             docker image prune -f
             docker cp config/config.prod.json join-app:/app/config/files/config.prod.json
       
