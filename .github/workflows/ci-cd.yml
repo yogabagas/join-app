@@ -70,6 +70,6 @@ jobs:
             docker image prune -f
             docker cp config/config.prod.json join-app:/app/config/files/config.prod.json
             docker cp join-app:/app/database/migration/v1 join-app/database/migration
-            migrate -path join-app/database/migration/ -database "mysql://root:root@tcp(joindb:3306)/joindb?parseTime=true" -verbose up
+            migrate -path join-app/database/migration/*.sql -database "mysql://root:root@tcp(localhost:3306)/joindb?parseTime=true" -verbose up
       
      
