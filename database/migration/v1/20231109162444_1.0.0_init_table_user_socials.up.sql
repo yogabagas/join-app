@@ -5,6 +5,5 @@ CREATE TABLE `user_socials` (
     `is_deleted` boolean NOT NULL DEFAULT 0,
     `created_at` datetime NOT NULL DEFAULT now(),
     `updated_at` datetime NOT NULL DEFAULT now(),
-    UNIQUE KEY (`link`),
     FOREIGN KEY (`user_uid`) REFERENCES users(`uid`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;

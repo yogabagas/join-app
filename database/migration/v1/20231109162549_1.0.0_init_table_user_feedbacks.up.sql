@@ -11,5 +11,5 @@ CREATE TABLE `user_feedbacks` (
     PRIMARY KEY (`id`),
     UNIQUE KEY (`uid`),
     UNIQUE KEY (`mentor_uid`, `created_by`),
-    FOREIGN KEY (`user_exp_uid`) REFERENCES user_experiences(`uid`)
+    FOREIGN KEY (`mentor_uid`) REFERENCES users(`uid`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;

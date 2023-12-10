@@ -5,5 +5,5 @@ CREATE TABLE `user_languages` (
     `created_at` datetime NOT NULL DEFAULT now(),
     `updated_at` datetime NOT NULL DEFAULT now(),
     PRIMARY KEY (`user_uid`, `language`),
-    FOREIGN KEY (`user_exp_uid`) REFERENCES user_experiences(`uid`)
+    FOREIGN KEY (`user_uid`) REFERENCES users(`uid`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
