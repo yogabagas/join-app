@@ -66,6 +66,7 @@ jobs:
             docker-compose -f docker-compose-app-bundle-prod.yml up -d
             docker image prune -f
             docker cp config/config.prod.json join-app:/app/config/files/config.prod.json
-            sudo docker exec join-app cp -f join-app:/app/database/migration/v1/. join-app/database/migration/
+            sudo rm -r join-app/database/migration/*
+            sudo docker cp join-app:/app/database/migration/v1/. join-app/database/migration/
       
      
