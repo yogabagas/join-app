@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	insertRoles     = `INSERT INTO roles (uid, name, created_by, updated_by) VALUES (?,?,?,?)`
+	insertRoles     = `INSERT INTO roles (uid, name, created_by, updated_by) VALUES ($1,$2,$3,$4)`
 	selectRolesByID = `SELECT id, uid, name, is_deleted, created_by, created_at, updated_by, updated_at 
-	FROM roles WHERE id = ?`
+	FROM roles WHERE id = $1`
 )
 
 type RolesRepositoryImpl struct {

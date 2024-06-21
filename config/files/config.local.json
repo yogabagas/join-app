@@ -1,6 +1,6 @@
 {
     "app": {
-        "name": "print-in app",
+        "name": "join-app",
         "host": "localhost",
         "port": ":8800",
         "read_timeout": 30,
@@ -16,10 +16,10 @@
     },
     "db": {
         "sql": {
-            "user": "root",
+            "user": "postgres",
             "password": "root",
-            "host": "localhost:3306",
-            "schema": "printindb"
+            "host": "localhost:5432",
+            "schema": "joinapp"
         }
     },
     "cache": {
@@ -41,6 +41,10 @@
             }, 
             {
                 "endpoint": "/v1/users",
+                "methods": ["POST"]
+            },
+            {
+                "endpoint": "/v1/roles",
                 "methods": ["POST"]
             }
         ]

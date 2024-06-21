@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
+	"github/yogabagas/join-app/controller/rest/handler/response"
 	"github/yogabagas/join-app/domain/service"
-	"github/yogabagas/join-app/transport/rest/handler/response"
 	"net/http"
 	"strconv"
 )
@@ -34,7 +34,7 @@ func (h *HandlerImpl) CreateUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.Controller.UsersController.CreateUsers(r.Context(), req)
+	err := h.UsersService.CreateUsers(r.Context(), req)
 	if err != nil {
 		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
 		return
@@ -91,7 +91,7 @@ func (h *HandlerImpl) GetUsersWithPagination(w http.ResponseWriter, r *http.Requ
 	}
 	req.Page = pageToInt
 
-	resp, err := h.Controller.UsersController.GetUsersWithPagination(r.Context(), req)
+	resp, err := h.UsersService.GetUsersWithPagination(r.Context(), req)
 	if err != nil {
 		res.SetError(response.ErrBadRequest).SetMessage(err.Error()).Send(w)
 		return

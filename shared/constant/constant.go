@@ -26,7 +26,8 @@ var (
 	Argon  PassAlgorithm = "argon"
 	SHA    PassAlgorithm = "sha"
 
-	MySQL DB = "mysql"
+	MySQL      DB = "mysql"
+	PostgreSQL DB = "postgres"
 
 	Mentor Role = 1
 	Mentee Role = 2

@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"github/yogabagas/join-app/config"
+	groupV1 "github/yogabagas/join-app/controller/rest/group/v1"
+	"github/yogabagas/join-app/controller/rest/handler"
+	"github/yogabagas/join-app/controller/rest/middlewares"
 	"github/yogabagas/join-app/registry"
-	groupV1 "github/yogabagas/join-app/transport/rest/group/v1"
-	"github/yogabagas/join-app/transport/rest/handler"
-	"github/yogabagas/join-app/transport/rest/middlewares"
 	"log"
 	"net/http"
 	"os"
@@ -58,11 +58,11 @@ func NewRest(o *Option) *Handler {
 		registry.NewCache(o.Redis),
 	)
 
-	appController := reg.NewAppController()
+	appService := reg.NewAppService()
 	middleware := middlewares.NewMiddleware(reg)
 
 	handlerImpl := handler.HandlerImpl{
-		Controller: appController,
+		appService,
 	}
 
 	r := mux.NewRouter()

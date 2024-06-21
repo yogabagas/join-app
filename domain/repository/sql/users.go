@@ -13,9 +13,9 @@ import (
 
 const (
 	insertUsers = `INSERT INTO users (uid, first_name, last_name, email, birthdate, description, gender, country, photo, created_by, updated_by) 
-	VALUES (?,?,?,?,?,?,?,?,?,?,?)`
+	VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`
 	selectUsersByEmail = `SELECT u.uid, a.role_uid, r.name as role_name, a.last_active FROM users u JOIN authz a ON u.uid = a.user_uid 
-	JOIN roles r ON a.role_uid = r.uid WHERE u.email = ? ORDER BY r.id ASC LIMIT 1`
+	JOIN roles r ON a.role_uid = r.uid WHERE u.email = $1 ORDER BY r.id ASC LIMIT 1`
 	selectUsersWithPagination = `SELECT u.uid, u.first_name, u.last_name, u.email, u.birthdate, u.username, u.created_at, 
 	(SELECT COUNT(*) from users us WHERE us.id = u.id) as per_page, r.name as role_name FROM users u JOIN authz a ON u.uid = a.user_uid 
 	JOIN roles r ON a.role_uid = r.uid %s`

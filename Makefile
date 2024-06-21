@@ -7,7 +7,7 @@ docker-build:
 docs:
 	@echo "> Generate Swagger Docs"
 	@if ! command -v swag &> /dev/null; then go install github.com/swaggo/swag/cmd/swag@latest ; fi
-	@swag init -g transport/rest/rest.go --parseDependency true --parseInternal --always-make
+	@swag init -g controller/rest/rest.go --parseDependency true --parseInternal --always-make
 
 start-up:
 	docker-compose up --build -d

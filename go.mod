@@ -11,6 +11,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.5.1
+	github.com/lib/pq v1.10.9
 	github.com/matthewhartstonge/argon2 v0.3.3
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/spf13/cobra v1.7.0

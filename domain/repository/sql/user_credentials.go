@@ -9,8 +9,8 @@ import (
 
 const (
 	insertUserCredentials = `INSERT INTO user_credentials (user_uid, username, password) 
-	VALUES (?,?,?)`
-	selectCredentialsByUserUIDAndPassword = `SELECT (1) FROM user_credentials WHERE user_uid = ? AND password = ?`
+	VALUES ($1,$2,$3)`
+	selectCredentialsByUserUIDAndPassword = `SELECT (1) FROM user_credentials WHERE user_uid = $1 AND password = $2`
 )
 
 type UserCredentialsRepositoryImpl struct {

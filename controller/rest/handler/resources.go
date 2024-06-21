@@ -3,8 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"github/yogabagas/join-app/controller/rest/handler/response"
 	"github/yogabagas/join-app/domain/service"
-	"github/yogabagas/join-app/transport/rest/handler/response"
 	"net/http"
 	"strconv"
 
@@ -38,7 +38,7 @@ func (h *HandlerImpl) CreateResources(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.Controller.ResourcesController.CreateResources(r.Context(), req)
+	err := h.ResourcesService.CreateResources(r.Context(), req)
 	if err != nil {
 		res.SetError(response.ErrInternalServerError).SetMessage(err.Error()).Send(w)
 		return
@@ -74,7 +74,7 @@ func (h *HandlerImpl) GetResourcesByType(w http.ResponseWriter, r *http.Request)
 		Type: ty,
 	}
 
-	resp, err := h.Controller.ResourcesController.GetResourcesByType(r.Context(), req)
+	resp, err := h.ResourcesService.GetResourcesByType(r.Context(), req)
 	if err != nil {
 		res.SetError(response.ErrInternalServerError).SetMessage(err.Error()).Send(w)
 		return

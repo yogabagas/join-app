@@ -3,18 +3,18 @@ package middlewares
 import (
 	"context"
 	"errors"
-	"github/yogabagas/join-app/adapter/controller"
 	"github/yogabagas/join-app/config"
+	"github/yogabagas/join-app/controller/rest/handler/response"
 	"github/yogabagas/join-app/domain/service"
 	"github/yogabagas/join-app/registry"
+	appService "github/yogabagas/join-app/service"
 	"github/yogabagas/join-app/shared/constant"
-	"github/yogabagas/join-app/transport/rest/handler/response"
 	"net/http"
 	"strings"
 )
 
 type MiddlewareImpl struct {
-	appController controller.AppController
+	appService.ServiceRegistry
 }
 
 type Middleware interface {
@@ -24,7 +24,7 @@ type Middleware interface {
 
 func NewMiddleware(r registry.Registry) Middleware {
 	return &MiddlewareImpl{
-		appController: r.NewAppController(),
+		r.NewAppService(),
 	}
 }
 
@@ -62,7 +62,7 @@ func (mi *MiddlewareImpl) isWhitelist(endpoint, method string) bool {
 	for _, v := range config.GlobalCfg.Whitelist.APIs {
 
 		if strings.ContainsAny(v.Endpoint, "*") {
-			if v.Endpoint[:strings.Index(v.Endpoint, "*")] == endpoint[:strings.Index(v.Endpoint, "*")] {
+			if strings.Contains(endpoint, v.Endpoint[:strings.Index(v.Endpoint, "*")]) {
 				v.Endpoint = endpoint
 			}
 		}
@@ -83,10 +83,7 @@ func (mi *MiddlewareImpl) isWhitelist(endpoint, method string) bool {
 
 func (mi *MiddlewareImpl) parseJwt(ctx context.Context, token string) (context.Context, bool) {
 
-	jwtSvc := mi.appController.JWKController
-	authzSvc := mi.appController.AuthzController
-
-	resp, err := jwtSvc.VerifyJWT(ctx, service.VerifyTokenReq{
+	resp, err := mi.JwkService.VerifyJWT(ctx, service.VerifyTokenReq{
 		Token: token,
 	})
 	if err != nil {
@@ -100,7 +97,7 @@ func (mi *MiddlewareImpl) parseJwt(ctx context.Context, token string) (context.C
 		ExpiredAt:  resp.ExpiredAt,
 	}
 
-	auth, _ := authzSvc.HasAuthenticated(ctx, service.HasAuthenticatedReq{
+	auth, _ := mi.AuthzService.HasAuthenticated(ctx, service.HasAuthenticatedReq{
 		Sub: claims.Sub,
 	})
 

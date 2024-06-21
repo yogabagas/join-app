@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	accessRepo "github/yogabagas/join-app/service/access/repository"
 	authzRepo "github/yogabagas/join-app/service/authz/repository"
-	jwkRepo "github/yogabagas/join-app/service/jwk/repository"
+	coursesRepo "github/yogabagas/join-app/service/modules/repository"
 	resourcesRepo "github/yogabagas/join-app/service/resources/repository"
 	rolesRepo "github/yogabagas/join-app/service/roles/repository"
 	userCredentialsRepo "github/yogabagas/join-app/service/userCredentials/repository"
@@ -26,8 +26,8 @@ type RepositoryRegistry interface {
 	JWKRepository() jwkRepo.JWKRepository
 	RolesRepository() rolesRepo.RolesRepository
 	ResourcesRepository() resourcesRepo.ResourcesRepository
-	UserCredentialsRepository() userCredentialsRepo.UserCredentialsRepository
-	UsersRepository() usersRepo.UsersRepository
+	UserRepository() usersRepo.UsersRepository
+	ModulesRepository() coursesRepo.ModulesRepository
 
 	DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error)
 }
@@ -83,6 +83,13 @@ func (r RepositoryRegistryImpl) UsersRepository() usersRepo.UsersRepository {
 		return NewUsersRepository(r.dbExecutor)
 	}
 	return NewUsersRepository(r.db)
+}
+
+func (r RepositoryRegistryImpl) ModulesRepository() coursesRepo.ModulesRepository {
+	if r.dbExecutor != nil {
+		return NewModulesRepository(r.dbExecutor)
+	}
+	return NewModulesRepository(r.db)
 }
 
 func (r RepositoryRegistryImpl) DoInTransaction(ctx context.Context, txFunc InTransaction) (out interface{}, err error) {

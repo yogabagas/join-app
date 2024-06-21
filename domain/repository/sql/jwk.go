@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	insertJWK              = "INSERT INTO jwk (id, `key`, expired_at) VALUES (?,?,?)"
-	updateJWK              = "UPDATE jwk SET `key` = ?, expired_at = ? WHERE id = ?"
-	selectUnexpiredKeyByID = "SELECT id, `key`, expired_at FROM jwk WHERE id = ? AND expired_at > ?"
-	selectUnexpiredKey     = "SELECT id, `key`, expired_at FROM jwk WHERE expired_at > ?"
+	insertJWK              = "INSERT INTO jwk (id, key_text, expired_at) VALUES ($1,$2,$3)"
+	updateJWK              = "UPDATE jwk SET key_text = $1, expired_at = $2 WHERE id = $3"
+	selectUnexpiredKeyByID = "SELECT id, key_text, expired_at FROM jwk WHERE id = $1 AND expired_at > to_timestamp($2)"
+	selectUnexpiredKey     = "SELECT id, key_text, expired_at FROM jwk WHERE expired_at > to_timestamp($1)"
 )
 
 type JWKRepositoryImpl struct {
@@ -57,7 +57,7 @@ func (jr *JWKRepositoryImpl) ReadUnexpiredKeyByID(ctx context.Context, req *mode
 
 func (jr *JWKRepositoryImpl) ReadUnexpiredKeys(ctx context.Context) (resp []*model.ReadUnexpiredKeyResp, err error) {
 
-	now := time.Now().UTC()
+	now := time.Now().Unix()
 
 	rows, err := jr.db.QueryContext(ctx, selectUnexpiredKey, now)
 	if err != nil {
