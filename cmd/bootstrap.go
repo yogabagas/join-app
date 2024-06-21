@@ -18,7 +18,7 @@ var (
 )
 
 func InitSQLModule() (*sql.DB, error) {
-	return sql.NewDBConn(constant.MySQL.String())
+	return sql.NewDBConn(constant.PostgreSQL.String())
 }
 
 func InitCache() cache.Cache {

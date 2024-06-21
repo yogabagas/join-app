@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"github/yogabagas/join-app/transport/rest/handler"
+	"github/yogabagas/join-app/controller/rest/handler"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -9,4 +9,5 @@ import (
 
 func NewResourcesV1(h handler.HandlerImpl, r *mux.Router) {
 	r.HandleFunc("/resources", h.CreateResources).Methods(http.MethodPost)
+	r.HandleFunc("/resources/{type}", h.GetResourcesByType).Methods(http.MethodGet)
 }

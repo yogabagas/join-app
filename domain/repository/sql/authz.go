@@ -9,7 +9,7 @@ import (
 
 const (
 	insertAuthz = `INSERT INTO authz (uid, user_uid, role_uid, last_active, created_by, updated_by)
-	VALUES (?,?,?,?,?,?)`
+	VALUES ($1,$2,$3,$4,$5,$6)`
 )
 
 type AuthzRepositoryImpl struct {

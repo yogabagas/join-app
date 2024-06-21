@@ -2,10 +2,11 @@ package registry
 
 import (
 	"database/sql"
-	"github/yogabagas/join-app/adapter/controller"
-	repoCache "github/yogabagas/join-app/domain/repository/cache"
+	"github/yogabagas/join-app/domain/repository/cache"
 	repo "github/yogabagas/join-app/domain/repository/sql"
-	"github/yogabagas/join-app/pkg/cache"
+	"github/yogabagas/join-app/service"
+
+	"github.com/go-redis/redis/v8"
 )
 
 type module struct {
@@ -14,7 +15,7 @@ type module struct {
 }
 
 type Registry interface {
-	NewAppController() controller.AppController
+	NewAppService() service.ServiceRegistry
 }
 
 type Option func(*module)
@@ -49,11 +50,13 @@ func (m *module) NewSessionRepositoryRegistry() repoCache.RepositoryRegistry {
 	return repoCache.NewRepositoryRegistry(m.sqlDB, m.cache)
 }
 
-func (m *module) NewAppController() controller.AppController {
-	return controller.AppController{
-		UsersController:     m.NewUsersController(),
-		RolesController:     m.NewRolesController(),
-		ResourcesController: m.NewResourcesController(),
-		ModulesController:   m.NewCoursesController(),
+func (m *module) NewAppService() service.ServiceRegistry {
+	return service.ServiceRegistry{
+		AccessService:    m.NewAccessService(),
+		AuthzService:     m.NewAuthzService(),
+		JwkService:       m.NewJWKService(),
+		ResourcesService: m.NewResourcesService(),
+		RolesService:     m.NewRolesService(),
+		UsersService:     m.NewUsersService(),
 	}
 }

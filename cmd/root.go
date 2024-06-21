@@ -8,7 +8,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "Print-in",
+	Use:   "join-app",
 	Short: "Project print app",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Use serve to start a server")

@@ -44,6 +44,16 @@ services:
       REDIS_PASSWORD: password
     networks:
       - fullstack
+      
+  migrate:
+    image: migrate/migrate
+    networks:
+      - fullstack
+    volumes:
+       - ./database/migration/v1:/v1
+    command: ["-path", "/v1", "-database", "mysql://root:root@tcp(db:3306)/joindb?parseTime=true","-verbose", "up"]
+    links:
+      - db
 
 volumes:
     api:

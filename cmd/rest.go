@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github/yogabagas/join-app/config"
-	"github/yogabagas/join-app/transport/rest"
+	"github/yogabagas/join-app/controller/rest"
 	"log"
 	"os"
 	"time"
@@ -33,8 +33,8 @@ var serverCmd = &cobra.Command{
 				Port:         config.GlobalCfg.App.Port,
 				ReadTimeout:  time.Duration(config.GlobalCfg.App.ReadTimeout * int(time.Second)),
 				WriteTimeout: time.Duration(config.GlobalCfg.App.WriteTimeout * int(time.Second)),
-				Sql:          sqlDB.MySQL,
-				Cache:        redisClient,
+				Sql:          sqlDB.PostgreSQL,
+				Redis:        redisClient.Client,
 			},
 		)
 		go rest.Serve()
